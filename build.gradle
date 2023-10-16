@@ -1,0 +1,181 @@
+plugins {
+    id 'java'
+    id 'com.google.protobuf' version '0.9.2'
+    id 'idea'
+    id 'application'
+    id 'visual-studio'
+    id 'maven-publish'
+}
+group 'com.nikhilm'
+sourceCompatibility = 1.11
+def grpcVersion = '1.53.0'
+def baseVersion = '3.9.4'
+def baseGroupId = 'io.github.adempiere'
+def privateDependencyBaseVersion = "adempiere-3.9.4"
+startScripts.enabled = false
+
+ext {
+	javaMainClass = "org.spin.template.server.TemplateServer"
+}
+
+application {
+	mainClass.set(javaMainClass)
+}
+jar {
+	manifest {
+		attributes(
+			"Main-Class": javaMainClass
+		)
+	}
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven {
+    	url = System.getenv("GITHUB_DEPLOY_REPOSITORY") ?: System.properties['deploy.repository'] ?: 'https://maven.pkg.github.com'
+        credentials {
+        	username = System.getenv("GITHUB_DEPLOY_USER") ?: System.properties['deploy.user']
+            password = System.getenv("GITHUB_DEPLOY_TOKEN") ?: System.properties['deploy.token'] 
+		}
+	}
+}
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.12.0"
+    }
+    plugins {
+        grpc {
+            artifact = 'io.grpc:protoc-gen-grpc-java:1.34.1'
+        }
+    }
+    generateProtoTasks {
+        all()*.plugins {
+            grpc {}
+        }
+        all().configureEach { task ->
+      		  // If true, will generate a descriptor_set.desc file under
+			  // task.outputBaseDir. Default is false.
+			  // See --descriptor_set_out in protoc documentation about what it is.
+			  task.generateDescriptorSet = true
+			
+			  // Allows to override the default for the descriptor set location
+			  task.descriptorSetOptions.path =
+			    "${projectDir}/build/descriptors/adempiere-grpc-template-service-service.pb"
+			
+			  // If true, the descriptor set will contain line number information
+			  // and comments. Default is false.
+			  task.descriptorSetOptions.includeSourceInfo = true
+			
+			  // If true, the descriptor set will contain all transitive imports and
+			  // is therefore self-contained. Default is false.
+			  task.descriptorSetOptions.includeImports = true
+    	}
+    }
+}
+sourceSets {
+    main {
+        java {
+            srcDirs 'build/generated/source/proto/main/grpc'
+            srcDirs 'build/generated/source/proto/main/java'
+            srcDirs 'src/main/proto'
+        }
+    }
+}
+task AdempiereTemplateServer(type: CreateStartScripts) {
+	mainClass = javaMainClass
+    applicationName = 'adempiere-grpc-template-service-server'
+    outputDir = new File(project.buildDir, 'tmp')
+    classpath = jar.outputs.files + project.configurations.runtimeClasspath
+}
+
+applicationDistribution.into('bin') {
+	from(AdempiereTemplateServer)
+    fileMode = 0755
+}
+
+//	Create release for project
+task createRelease(type: Copy) {
+   dependsOn build
+   from file("$buildDir/distributions/")
+   into file("$buildDir/release/")
+   //destinationDir(file('build/release/'))
+   doLast {
+        file('build/release/')
+        	.listFiles({file -> file.isFile()} as FileFilter).sort()
+        	.each { File file ->
+            ant.checksum file: file
+        }
+   	}
+}
+dependencies {
+	implementation fileTree(
+        dir: 'dependencies',
+        include: [
+            '*.jar'
+        ]
+    )
+    implementation "io.grpc:grpc-netty-shaded:${grpcVersion}"
+    implementation "io.grpc:grpc-alts:${grpcVersion}"
+    implementation "io.netty:netty-handler:4.1.89.Final"
+    implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+    implementation "io.grpc:grpc-stub:${grpcVersion}"
+    implementation "io.grpc:grpc-netty:${grpcVersion}"
+    // https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java
+	implementation 'com.google.protobuf:protobuf-java:3.24.3'
+	implementation 'com.google.protobuf:protobuf-java-util:3.24.3'
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.11.2'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.2'
+    //implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
+	//implementation 'com.sun.xml.bind:jaxb-impl:3.0.0-M4'
+	//implementation 'com.sun.xml.bind:jaxb-core:3.0.0-M4'
+	//implementation 'javax.activation:activation:1.1.1'
+	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.0'
+	//	ADempiere Core
+	implementation "${baseGroupId}:base:${baseVersion}"
+	implementation "${baseGroupId}:adempiere-grpc-utils:1.0.6"
+	//	Others
+    compileOnly 'org.apache.tomcat:annotations-api:6.0.53'
+}
+
+
+def packageVersion = System.getenv("LIBRARY_VERSION") ?: '1.0.0'
+
+publishing {
+    repositories {
+        maven {
+            url = System.properties['deploy.packages'] ?: System.getenv("GITHUB_PACKAGES_URL") ?: "https://maven.pkg.github.com/"
+            credentials {
+                username = System.properties['deploy.user'] ?: System.getenv("GITHUB_DEPLOY_USER") ?: ''
+                password = System.properties['deploy.token'] ?: System.getenv("GITHUB_DEPLOY_TOKEN") ?: ''
+            }
+        }
+    }
+    publications {
+		mavenJava(MavenPublication) {
+        	groupId 'org.adempiere.template'
+            artifactId 'adempiere-grpc-template-service'
+            version packageVersion
+           	from components.java
+           	pom {
+                name = 'ADempiere Template'
+                description = 'A Template for ADempiere ERP'
+                url = 'https://www.erpya.com/'
+                licenses {
+                    license {
+                        name = 'GNU General Public License v3.0'
+                        url = 'https://www.gnu.org/licenses/gpl-3.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'yamelsenih'
+                        name = 'Yamel Senih'
+                        email = 'ysenih@erpya.com'
+                    }
+                }
+            }
+		}
+	}
+}

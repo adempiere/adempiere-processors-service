@@ -1,0 +1,56 @@
+# This workflow will build a Java project with Gradle
+# This file was contributed by ysenih@erpya.com from ERP Consultores y Asociados, C.A
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+# Add support to default build
+
+name: Continuous Integration with Gradle
+
+on:
+  push:
+    branches:
+      - '*'         # matches every branch that doesn't contain a '/'
+      - '*/*'       # matches every branch containing a single '/'
+      - '**'        # matches every branch
+    paths-ignore:
+      - README.md
+      - README.es.md
+
+  pull_request:
+    branches:
+      - main
+      - master
+      - develop
+      - experimental
+      - bugfix/**
+      - hotfix/**
+      - feature/**
+    paths-ignore:
+      - README.md
+      - README.es.md
+
+jobs:
+
+  build-ci:
+    name: Build Template
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+
+      - name: Set up Java JDK 11
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-package: 'jdk'
+          java-version: 11
+          architecture: x64
+
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@v2
+        env:
+          GITHUB_DEPLOY_USER: "${{ github.actor }}"
+          GITHUB_DEPLOY_TOKEN: "${{ secrets.DEPLOY_TOKEN }}"
+          GITHUB_DEPLOY_REPOSITORY: ${{ secrets.DEPLOY_REPOSITORY }}
+        with:
+          gradle-version: 8.0.2
+          arguments: build
