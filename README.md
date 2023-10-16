@@ -38,7 +38,7 @@ For Token validation is used [JWT](https://www.viralpatel.net/java-create-valida
 ## Run with Docker
 
 ```Shell
-docker pull openls/adempiere-processors-service:alpine-1.0.0
+docker pull openls/adempiere-processors-service:alpine-1.0.1
 ```
 
 ### Minimal Docker Requirements
@@ -58,7 +58,7 @@ To use this Docker image you must have your Docker engine version greater than o
 You can download the last image from docker hub, just run the follow command:
 
 ```Shell
-docker run -d -p 50059:50059 --name adempiere-processors-service -e DB_HOST="localhost" -e DB_PORT=5432 -e DB_NAME="adempiere" -e DB_USER="adempiere" -e DB_PASSWORD="adempiere" openls/adempiere-processors-service:alpine-1.0.0
+docker run -d -p 50059:50059 --name adempiere-processors-service -e DB_HOST="localhost" -e DB_PORT=5432 -e DB_NAME="adempiere" -e DB_USER="adempiere" -e DB_PASSWORD="adempiere" openls/adempiere-processors-service:alpine-1.0.1
 ```
 
 See all images [here](https://hub.docker.com/r/openls/adempiere-processors-service)
