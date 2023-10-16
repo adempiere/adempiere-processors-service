@@ -4,7 +4,6 @@ plugins {
     id 'idea'
     id 'application'
     id 'visual-studio'
-    id 'maven-publish'
 }
 group 'com.nikhilm'
 sourceCompatibility = 1.11
@@ -15,7 +14,7 @@ def privateDependencyBaseVersion = "adempiere-3.9.4"
 startScripts.enabled = false
 
 ext {
-	javaMainClass = "org.spin.template.server.TemplateServer"
+	javaMainClass = "org.spin.processor.server.ProcessorServer"
 }
 
 application {
@@ -82,7 +81,7 @@ sourceSets {
         }
     }
 }
-task AdempiereTemplateServer(type: CreateStartScripts) {
+task AdempiereProcessorServer(type: CreateStartScripts) {
 	mainClass = javaMainClass
     applicationName = 'adempiere-processors-service-server'
     outputDir = new File(project.buildDir, 'tmp')
@@ -90,7 +89,7 @@ task AdempiereTemplateServer(type: CreateStartScripts) {
 }
 
 applicationDistribution.into('bin') {
-	from(AdempiereTemplateServer)
+	from(AdempiereProcessorServer)
     fileMode = 0755
 }
 
@@ -138,45 +137,4 @@ dependencies {
 	implementation "${baseGroupId}:adempiere-business-processors:1.0.9"
 	//	Others
     compileOnly 'org.apache.tomcat:annotations-api:6.0.53'
-}
-
-
-def packageVersion = System.getenv("LIBRARY_VERSION") ?: '1.0.0'
-
-publishing {
-    repositories {
-        maven {
-            url = System.properties['deploy.packages'] ?: System.getenv("GITHUB_PACKAGES_URL") ?: "https://maven.pkg.github.com/"
-            credentials {
-                username = System.properties['deploy.user'] ?: System.getenv("GITHUB_DEPLOY_USER") ?: ''
-                password = System.properties['deploy.token'] ?: System.getenv("GITHUB_DEPLOY_TOKEN") ?: ''
-            }
-        }
-    }
-    publications {
-		mavenJava(MavenPublication) {
-        	groupId 'org.adempiere.template'
-            artifactId 'adempiere-processors-service'
-            version packageVersion
-           	from components.java
-           	pom {
-                name = 'ADempiere Template'
-                description = 'A Template for ADempiere ERP'
-                url = 'https://www.erpya.com/'
-                licenses {
-                    license {
-                        name = 'GNU General Public License v3.0'
-                        url = 'https://www.gnu.org/licenses/gpl-3.0.txt'
-                    }
-                }
-                developers {
-                    developer {
-                        id = 'yamelsenih'
-                        name = 'Yamel Senih'
-                        email = 'ysenih@erpya.com'
-                    }
-                }
-            }
-		}
-	}
 }
