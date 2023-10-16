@@ -61,7 +61,7 @@ protobuf {
 			
 			  // Allows to override the default for the descriptor set location
 			  task.descriptorSetOptions.path =
-			    "${projectDir}/build/descriptors/adempiere-grpc-template-service-service.pb"
+			    "${projectDir}/build/descriptors/adempiere-processors-service-service.pb"
 			
 			  // If true, the descriptor set will contain line number information
 			  // and comments. Default is false.
@@ -84,7 +84,7 @@ sourceSets {
 }
 task AdempiereTemplateServer(type: CreateStartScripts) {
 	mainClass = javaMainClass
-    applicationName = 'adempiere-grpc-template-service-server'
+    applicationName = 'adempiere-processors-service-server'
     outputDir = new File(project.buildDir, 'tmp')
     classpath = jar.outputs.files + project.configurations.runtimeClasspath
 }
@@ -135,6 +135,7 @@ dependencies {
 	//	ADempiere Core
 	implementation "${baseGroupId}:base:${baseVersion}"
 	implementation "${baseGroupId}:adempiere-grpc-utils:1.0.6"
+	implementation "${baseGroupId}:adempiere-business-processors:1.0.9"
 	//	Others
     compileOnly 'org.apache.tomcat:annotations-api:6.0.53'
 }
@@ -155,7 +156,7 @@ publishing {
     publications {
 		mavenJava(MavenPublication) {
         	groupId 'org.adempiere.template'
-            artifactId 'adempiere-grpc-template-service'
+            artifactId 'adempiere-processors-service'
             version packageVersion
            	from components.java
            	pom {

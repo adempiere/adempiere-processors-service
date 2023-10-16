@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>adempiere-grpc-template-service</name>
+	<name>adempiere-processors-service</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -22,7 +22,7 @@
 	</natures>
 	<filteredResources>
 		<filter>
-			<id>1677529750522</id>
+			<id>0</id>
 			<name></name>
 			<type>30</type>
 			<matcher>

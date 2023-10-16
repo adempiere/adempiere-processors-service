@@ -13,51 +13,96 @@
  * You should have received a copy of the GNU General Public License                 *
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.            *
  ************************************************************************************/
-package org.spin.template.setup;
+package org.spin.processor.setup;
 
 /**
  * Determinate all ADempiere client setup values for Human Resource
  * @author Yamel Senih
  */
-public class SetupWrapper {
-	/**	Server	*/
-	private Server server;
+public class Database {
+	/**	Host Name	*/
+	private String host;
+	/**	Port	*/
+	private int port;
+	/**	User Name	*/
+	private String user;
+	/**	Password	*/
+	private String password;
 	/**	Database	*/
-	private Database database;
+	private String name;
+	/**	Database type	*/
+	private String type;
 	
 	/**
 	 * Default constructor
-	 * @param server
-	 * @param database
+	 * @param host
+	 * @param port
+	 * @param user
+	 * @param password
+	 * @param name
+	 * @param type
 	 */
-	public SetupWrapper(Server server, Database database) {
-		this.server = server;
-		this.database = database;
+	public Database(String host, int port, String user, String password, String name, String type) {
+		this.host = host;
+		this.port = port;
+		this.user = user;
+		this.password = password;
+		this.name = name;
+		this.type = type;
 	}
 	
 	/**
-	 * Default without parameters
+	 * Default constructor without parameters
 	 */
-	public SetupWrapper() {
+	public Database() {
 		
-	}
-	
-	/**
-	 * @return the database
-	 */
-	public final Database getDatabase() {
-		return database;
 	}
 
 	/**
-	 * @return the server
+	 * @return the host
 	 */
-	public final Server getServer() {
-		return server;
+	public final String getHost() {
+		return host;
+	}
+
+	/**
+	 * @return the port
+	 */
+	public final int getPort() {
+		return port;
+	}
+
+	/**
+	 * @return the user
+	 */
+	public final String getUser() {
+		return user;
+	}
+
+	/**
+	 * @return the password
+	 */
+	public final String getPassword() {
+		return password;
+	}
+
+	/**
+	 * @return the name
+	 */
+	public final String getName() {
+		return name;
+	}
+
+	/**
+	 * @return the type
+	 */
+	public final String getType() {
+		return type;
 	}
 
 	@Override
 	public String toString() {
-		return "SetupWrapper [server=" + server + ", database=" + database + "]";
+		return "Database [host=" + host + ", port=" + port + ", user=" + user + ", password=******, name="
+				+ name + ", type=" + type + "]";
 	}
 }
