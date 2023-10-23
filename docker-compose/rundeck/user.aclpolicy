@@ -1,0 +1,25 @@
+description: Basic Access
+context:
+  application: 'rundeck'
+by:
+  group: 'user'
+for:
+  project:
+    - equals:
+        name: 'sell-in-sell-out'
+      allow: [read]
+---
+description: Project Access
+context: 
+  project: 'sell-in-sell-out'
+by: 
+  group: 'user'
+for:
+  job:
+    - allow: [read,run,runAs,kill,killAs] # allow create/read/write/delete/run/kill of all jobs
+  node:
+    - allow: [read,run]
+  adhoc: 
+    - allow: 'read'
+  resource:
+    - allow: 'read'

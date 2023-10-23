@@ -41,6 +41,35 @@ services:
     networks:
       - shared_network
 
+  dkron-scheduler:
+    image: ${DKRON_IMAGE}
+    container_name: ${DKRON_HOST}
+    restart: ${GENERIC_RESTART}
+    ports:
+      - ${DKRON_PORT}:8080
+    command:
+      - "agent"
+      - "--bootstrap-expect=1"
+      - "--node-name=node1"
+      - "--server"
+      - "--ui=false"
+    volumes:
+      - volume_dkron:/dkron.data
+    networks:
+      - shared_network
+
+  rundeck-scheduler:
+    container_name: ${RUNDECK_HOST}
+    image: ${RUNDECK_IMAGE}
+    restart: ${GENERIC_RESTART}
+    ports:
+      - ${RUNDECK_PORT}:4440
+    volumes:
+      - ${RUNDECK_REALM_SETTING}:/home/rundeck/server/config/realm.properties
+      - ${RUNDECK_USER_POLICIES}:/home/rundeck/etc/user.aclpolicy
+    networks:
+        - shared_network
+
   grpc.proxy:
       image: ${ENVOY_IMAGE_NAME}
       container_name: ${ENVOY_NAME}
@@ -61,3 +90,5 @@ networks:
 volumes:
   volume_postgres:
     name: ${POSTGRES_VOLUME}
+  volume_dkron:
+    name: ${DKRON_VOLUME}
