@@ -24,8 +24,8 @@ services:
       - shared_network
       
   adempiere.processor:
-    image: ${ADEMPIERE_GRPC_SERVER_IMAGE}
-    container_name: ${VUE_BACKEND_HOST}
+    image: ${ADEMPIERE_PROCESSOR_IMAGE}
+    container_name: ${ADEMPIERE_PROCESSOR_HOST}
     restart: ${GENERIC_RESTART}
     healthcheck:
       test: "bash -c 'printf \"GET / HTTP/1.1\n\n\" > /dev/tcp/127.0.0.1/50059; exit $?;'"
@@ -41,7 +41,7 @@ services:
     networks:
       - shared_network
 
-  dkron-scheduler:
+  dkron.scheduler:
     image: ${DKRON_IMAGE}
     container_name: ${DKRON_HOST}
     restart: ${GENERIC_RESTART}
@@ -58,7 +58,7 @@ services:
     networks:
       - shared_network
 
-  rundeck-scheduler:
+  rundeck.scheduler:
     container_name: ${RUNDECK_HOST}
     image: ${RUNDECK_IMAGE}
     restart: ${GENERIC_RESTART}
