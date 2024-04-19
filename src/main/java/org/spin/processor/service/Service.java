@@ -30,7 +30,7 @@ import org.spin.eca46.process.SchedulerProcessor;
 import org.spin.eca46.process.WorkflowProcessor;
 import org.spin.proto.processor.ProcessorLog;
 import org.spin.proto.processor.RunProcessorResponse;
-import org.spin.service.grpc.util.ValueManager;
+import org.spin.service.grpc.util.value.ValueManager;
 
 public class Service {
 	

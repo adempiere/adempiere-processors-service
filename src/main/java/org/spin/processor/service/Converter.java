@@ -18,7 +18,7 @@ package org.spin.processor.service;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 import org.spin.proto.processor.ProcessorLog;
-import org.spin.service.grpc.util.ValueManager;
+import org.spin.service.grpc.util.value.ValueManager;
 
 /**
  * Class for convert any document
