@@ -17,10 +17,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Java JDK 11
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-package: 'jdk'
@@ -28,7 +28,7 @@ jobs:
           architecture: x64
 
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.0.2
           arguments: createRelease
@@ -37,26 +37,32 @@ jobs:
           GITHUB_DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
           GITHUB_DEPLOY_REPOSITORY: ${{ secrets.DEPLOY_REPOSITORY }}
 
+      - name: Upload descriptor file artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: adempiere-processors-service.dsc
+          path: build/descriptors/adempiere-processors-service.dsc
+
       - name: Upload dist app zip artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: adempiere-processors-service.zip
           path: build/release/adempiere-processors-service.zip
 
       - name: Upload dist app zip.MD5 artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: adempiere-processors-service.zip.MD5
           path: build/release/adempiere-processors-service.zip.MD5
 
       - name: Upload dist app tar artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: adempiere-processors-service.tar
           path: build/release/adempiere-processors-service.tar
 
       - name: Upload dist app tar.MD5 artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: adempiere-processors-service.tar.MD5
           path: build/release/adempiere-processors-service.tar.MD5
@@ -70,7 +76,14 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Download all artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
+
+      - name: Upload Descriptor
+        uses: skx/github-action-publish-binaries@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: adempiere-processors-service.dsc/adempiere-processors-service.dsc
 
       - name: Upload zip
         uses: skx/github-action-publish-binaries@master

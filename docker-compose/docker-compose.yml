@@ -22,7 +22,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     networks:
       - shared_network
-      
+
   adempiere.processor:
     image: ${ADEMPIERE_PROCESSOR_IMAGE}
     container_name: ${ADEMPIERE_PROCESSOR_HOST}
@@ -75,7 +75,7 @@ services:
       container_name: ${ENVOY_NAME}
       volumes:
           - ./envoy/envoy.yaml:/etc/envoy/envoy.yaml:ro
-          - ./envoy/definitions/adempiere-processors-service-service.pb:/data/adempiere-processors-service-service.pb:ro
+          - ./envoy/definitions/adempiere-processors-service.dsc:/data/adempiere-processors-service.dsc:ro
       depends_on:
         - adempiere.processor
       ports:
@@ -83,10 +83,11 @@ services:
       networks:
         - shared_network
 
+
 networks:
   shared_network:
     name: ${ADEMPIERE_NETWORK}
-    
+
 volumes:
   volume_postgres:
     name: ${POSTGRES_VOLUME}
