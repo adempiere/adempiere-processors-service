@@ -13,7 +13,7 @@ jobs:
 
   # Build dist application adempiere-processors-service
   build-app:
-    name: Build dist Template
+    name: Build ADempiere Processors Service
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
