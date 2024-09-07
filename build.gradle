@@ -5,12 +5,18 @@ plugins {
     id 'application'
     id 'visual-studio'
 }
+
 group 'com.nikhilm'
+
 sourceCompatibility = 1.11
+
 def grpcVersion = '1.62.2'
+def protobufVersion = '3.25.3'
 def baseVersion = '3.9.4'
 def baseGroupId = 'io.github.adempiere'
 def privateDependencyBaseVersion = "adempiere-3.9.4"
+def descriptorFile = "adempiere-processors-service.dsc"
+
 startScripts.enabled = false
 
 ext {
@@ -29,23 +35,26 @@ jar {
 }
 
 repositories {
+	mavenLocal()
     mavenCentral()
-    mavenLocal()
     maven {
-    	url = System.getenv("GITHUB_DEPLOY_REPOSITORY") ?: System.properties['deploy.repository'] ?: 'https://maven.pkg.github.com'
-        credentials {
-        	username = System.getenv("GITHUB_DEPLOY_USER") ?: System.properties['deploy.user']
-            password = System.getenv("GITHUB_DEPLOY_TOKEN") ?: System.properties['deploy.token'] 
+		// Adempiere GitHub Organization
+		url = findProperty("deployRepository") ?: System.properties['deploy.repository'] ?: System.getenv("GITHUB_DEPLOY_REPOSITORY") ?: 'https://maven.pkg.github.com'
+		credentials {
+			// project property, system properrty, enviroment variable
+			username = findProperty("deployUsername") ?: System.properties['deploy.user'] ?: System.getenv("GITHUB_DEPLOY_USER")
+			password = findProperty("deployToken") ?: System.properties['deploy.token'] ?: System.getenv("GITHUB_DEPLOY_TOKEN")
 		}
 	}
 }
+
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:3.12.0"
+		artifact = "com.google.protobuf:protoc:${protobufVersion}"
     }
     plugins {
         grpc {
-            artifact = 'io.grpc:protoc-gen-grpc-java:1.34.1'
+			artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}"
         }
     }
     generateProtoTasks {
@@ -53,25 +62,26 @@ protobuf {
             grpc {}
         }
         all().configureEach { task ->
-      		  // If true, will generate a descriptor_set.desc file under
-			  // task.outputBaseDir. Default is false.
-			  // See --descriptor_set_out in protoc documentation about what it is.
-			  task.generateDescriptorSet = true
+			// If true, will generate a descriptor_set.desc file under
+			// task.outputBaseDir. Default is false.
+			// See --descriptor_set_out in protoc documentation about what it is.
+			task.generateDescriptorSet = true
 			
-			  // Allows to override the default for the descriptor set location
-			  task.descriptorSetOptions.path =
-			    "${projectDir}/build/descriptors/adempiere-processors-service-service.pb"
+			// Allows to override the default for the descriptor set location
+			task.descriptorSetOptions.path = "${projectDir}/build/descriptors/${descriptorFile}"
+			// task.descriptorSetOptions.path = "${projectDir}/build/descriptors/adempiere-processors-service.dsc"
 			
-			  // If true, the descriptor set will contain line number information
-			  // and comments. Default is false.
-			  task.descriptorSetOptions.includeSourceInfo = true
+			// If true, the descriptor set will contain line number information
+			// and comments. Default is false.
+			task.descriptorSetOptions.includeSourceInfo = true
 			
-			  // If true, the descriptor set will contain all transitive imports and
-			  // is therefore self-contained. Default is false.
-			  task.descriptorSetOptions.includeImports = true
-    	}
-    }
+			// If true, the descriptor set will contain all transitive imports and
+			// is therefore self-contained. Default is false.
+			task.descriptorSetOptions.includeImports = true
+		}
+	}
 }
+
 sourceSets {
     main {
         java {
@@ -81,6 +91,22 @@ sourceSets {
         }
     }
 }
+
+// Copy proto descriptor another folder
+allprojects {
+	task copyDescriptor(type: Copy) {
+		from "${projectDir}/build/descriptors/${descriptorFile}"
+		into "${projectDir}/docker-compose/envoy/definitions"
+		// rename { "${descriptorFile}" }
+	}
+
+	tasks.matching {
+		it.name.startsWith('compileJava')
+	}.each { task ->
+		task.finalizedBy copyDescriptor
+	}
+}
+
 task AdempiereProcessorServer(type: CreateStartScripts) {
 	mainClass = javaMainClass
     applicationName = 'adempiere-processors-service-server'
@@ -114,15 +140,16 @@ dependencies {
             '*.jar'
         ]
     )
-    implementation "io.grpc:grpc-netty-shaded:${grpcVersion}"
-    implementation "io.grpc:grpc-alts:${grpcVersion}"
-    implementation "io.netty:netty-handler:4.1.107.Final"
-    implementation "io.grpc:grpc-protobuf:${grpcVersion}"
-    implementation "io.grpc:grpc-stub:${grpcVersion}"
-    implementation "io.grpc:grpc-netty:${grpcVersion}"
-    // https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java
-	implementation 'com.google.protobuf:protobuf-java:3.25.3'
-	implementation 'com.google.protobuf:protobuf-java-util:3.25.3'
+	implementation "io.grpc:grpc-netty-shaded:${grpcVersion}"
+	implementation "io.grpc:grpc-alts:${grpcVersion}"
+	implementation "io.netty:netty-handler:4.1.107.Final"
+	implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+	implementation "io.grpc:grpc-stub:${grpcVersion}"
+	implementation "io.grpc:grpc-netty:${grpcVersion}"
+	// https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java
+	implementation "com.google.protobuf:protobuf-java:${protobufVersion}"
+	implementation "com.google.protobuf:protobuf-java-util:${protobufVersion}"
+
     implementation "io.jsonwebtoken:jjwt-api:0.12.6"
 	implementation "io.jsonwebtoken:jjwt-impl:0.12.6"
 	implementation "io.jsonwebtoken:jjwt-jackson:0.12.6"
@@ -130,7 +157,8 @@ dependencies {
 	//implementation 'com.sun.xml.bind:jaxb-impl:3.0.0-M4'
 	//implementation 'com.sun.xml.bind:jaxb-core:3.0.0-M4'
 	//implementation 'javax.activation:activation:1.1.1'
-	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.0'
+	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.17.0'
+
 	//	ADempiere Core
 	implementation "${baseGroupId}:base:${baseVersion}"
 	implementation "${baseGroupId}:adempiere-grpc-utils:1.4.8"
