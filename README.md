@@ -103,3 +103,11 @@ You can change variables editing the `.env` file. Note that this file have a min
 ## What else?
 
 Just run it using any gRPC client or Rest API client with envoy
+
+Here some video (Spanish Version)
+
+- [01 Definición de Servicios para Procesadores](https://www.loom.com/share/7c14ffbad8444430a809836867728f1e?sid=59c59671-0e41-4f08-8a77-f9277da2d132)
+- [02 Cómo Exportar Procesadores de ADempiere](https://www.loom.com/share/1b00a0512f8244fea098b02e32d9fc28?sid=08e6a94b-52c2-4b13-99f5-c4c7427332ef)
+- [03 Uso de dKron para Ejecución de Procesos](https://www.loom.com/share/3d8850daca1b45cea43d402c1191ef81?sid=85ca2797-a406-437f-a70f-a84b33fc8f6b)
+- [04 Definición de Parámetros I](https://www.loom.com/share/a54d18a96fa54ae4bf01e438aef4c616?sid=c66825e0-2f93-40d3-8565-d42e9ddb9d98)
+- [05 Definición de Parámetros II](https://www.loom.com/share/54c8789b39bc4d0abefb0618e2a74dd8?sid=b85d27fd-55ae-400b-a90a-dc405b149b52)
