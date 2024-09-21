@@ -2,16 +2,15 @@ version: "3.9"
 
 services:
   adempiere.db:
-    build:
-      context: postgresql/
-      dockerfile: Dockerfile
     container_name: ${POSTGRES_NAME}
-    image: ${POSTGRES_NAME}
+    image: ${POSTGRES_IMAGE}
     restart: ${GENERIC_RESTART}
     ports:
-      - ${POSTGRES_PORT}
+      - ${POSTGRES_PORT}:5432
     volumes:
       - volume_postgres:/var/lib/postgresql/data
+      - ./postgresql/initdb.sh:/docker-entrypoint-initdb.d/initdb.sh
+      - ./postgresql/adempiere:/tmp/adempiere
     healthcheck:
       test: "bash -c 'printf \"GET / HTTP/1.1\n\n\" > /dev/tcp/127.0.0.1/5432; exit $?;'"
       interval: 10s
@@ -52,23 +51,27 @@ services:
       - "--bootstrap-expect=1"
       - "--node-name=node1"
       - "--server"
-      - "--ui=false"
+#      - "--ui=false"
     volumes:
       - volume_dkron:/dkron.data
     networks:
       - shared_network
-
-  rundeck.scheduler:
-    container_name: ${RUNDECK_HOST}
-    image: ${RUNDECK_IMAGE}
+      
+  adempiere.zk:
+    image: ${ADEMPIERE_ZK_IMAGE}
+    container_name: ${ADEMPIERE_ZK_HOST}
     restart: ${GENERIC_RESTART}
     ports:
-      - ${RUNDECK_PORT}:4440
-    volumes:
-      - ${RUNDECK_REALM_SETTING}:/home/rundeck/server/config/realm.properties
-      - ${RUNDECK_USER_POLICIES}:/home/rundeck/etc/user.aclpolicy
+      - ${ADEMPIERE_ZK_PORT}:8080
+    environment:
+      ADEMPIERE_DB_SERVER: ${ADEMPIERE_ZK_DB_HOST}
+      ADEMPIERE_DB_NAME: ${ADEMPIERE_ZK_DB_NAME}
+      ADEMPIERE_DB_PASSWORD: ${ADEMPIERE_ZK_DB_PASSWORD}
+    depends_on:
+      adempiere.db:
+        condition: service_healthy
     networks:
-        - shared_network
+      - shared_network
 
   grpc.proxy:
       image: ${ENVOY_IMAGE_NAME}
