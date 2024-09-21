@@ -32,6 +32,20 @@ public class Database {
 	private String name;
 	/**	Database type	*/
 	private String type;
+	/**	IDLE Timeout	*/
+	private long idle_timeout;
+	/**	Minimum IDLE	*/
+	private int minimum_idle;
+	/**	Maximum Pool Size	*/
+	private int maximum_pool_size;
+	/**	Connection Timeout	*/
+	private long connection_timeout;
+	/**	Maximum Lifetime	*/
+	private long maximum_lifetime;
+	/**	Keepalive Time	*/
+	private long keepalive_time;
+	/**	Connection Test Query	*/
+	private String connection_test_query;
 	
 	/**
 	 * Default constructor
@@ -98,6 +112,34 @@ public class Database {
 	 */
 	public final String getType() {
 		return type;
+	}
+
+	public long getIdle_timeout() {
+		return idle_timeout;
+	}
+
+	public int getMinimum_idle() {
+		return minimum_idle;
+	}
+
+	public int getMaximum_pool_size() {
+		return maximum_pool_size;
+	}
+
+	public long getConnection_timeout() {
+		return connection_timeout;
+	}
+
+	public long getMaximum_lifetime() {
+		return maximum_lifetime;
+	}
+
+	public long getKeepalive_time() {
+		return keepalive_time;
+	}
+
+	public String getConnection_test_query() {
+		return connection_test_query;
 	}
 
 	@Override

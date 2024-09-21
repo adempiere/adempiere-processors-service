@@ -26,6 +26,7 @@ import org.compiere.util.CLogMgt;
 import org.compiere.util.DB;
 import org.compiere.util.Ini;
 import org.spin.processor.setup.SetupLoader;
+import org.spin.server.config.BackendDatabaseConfig;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -109,7 +110,21 @@ public class SetupLoader {
 		//	Set default init
 		Ini.setProperty(Ini.P_CONNECTION, connection.toStringLong());
 		Ini.setClient(true);
-//		Ini.setProperty(Ini.P_ADEMPIERE_APPS_TYPE, "wildfly");
+		//	Set Database default parameters
+		//	Close inactive connections after 5 minutes 300
+		BackendDatabaseConfig.setIdleTimeout(dataBase.getIdle_timeout());
+		//	Minimum connection opening 1
+		BackendDatabaseConfig.setMinimumIdle(dataBase.getMinimum_idle());
+		//	10
+		BackendDatabaseConfig.setMaximumPoolSize(dataBase.getMaximum_pool_size() + 1);
+		//	New connection waiting time 5 seconds 5000
+		BackendDatabaseConfig.setConnectionTimeout(dataBase.getConnection_timeout());
+		//	Close connections after 10 minutes
+		BackendDatabaseConfig.setMaxLifetime(dataBase.getMaximum_lifetime());
+		//	Validate connection each 6 minutes 360000
+		BackendDatabaseConfig.setKeepaliveTime(dataBase.getKeepalive_time());
+		//	Test connection just make a ping to validate database "SELECT 1"
+		BackendDatabaseConfig.setConnectionTestQuery(dataBase.getConnection_test_query());
 		Level logLevel = Level.parse(setup.getServer().getLog_level().toUpperCase());
 		Ini.setProperty(Ini.P_TRACEFILE, logLevel.getName());
 		CLogMgt.setLevel(logLevel);

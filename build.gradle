@@ -39,7 +39,7 @@ repositories {
     mavenCentral()
     maven {
 		// Adempiere GitHub Organization
-		url = findProperty("deployRepository") ?: System.properties['deploy.repository'] ?: System.getenv("GITHUB_DEPLOY_REPOSITORY") ?: 'https://maven.pkg.github.com'
+		url = 'https://maven.pkg.github.com/adempiere/adempiere'
 		credentials {
 			// project property, system properrty, enviroment variable
 			username = findProperty("deployUsername") ?: System.properties['deploy.user'] ?: System.getenv("GITHUB_DEPLOY_USER")
@@ -47,7 +47,6 @@ repositories {
 		}
 	}
 }
-
 protobuf {
     protoc {
 		artifact = "com.google.protobuf:protoc:${protobufVersion}"
@@ -161,7 +160,7 @@ dependencies {
 
 	//	ADempiere Core
 	implementation "${baseGroupId}:base:${baseVersion}"
-	implementation "${baseGroupId}:adempiere-grpc-utils:1.4.8"
+	implementation "${baseGroupId}:adempiere-grpc-utils:1.5.1"
 	implementation "${baseGroupId}:adempiere-business-processors:1.1.5"
 	//	Others
     compileOnly 'org.apache.tomcat:annotations-api:6.0.53'

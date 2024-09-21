@@ -46,11 +46,11 @@ jobs:
           architecture: x64
 
       - name: Build with Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/gradle-build-action@v3
+        env:
+          GITHUB_DEPLOY_USER: "${{ secrets.DEPLOY_USER }}"
+          GITHUB_DEPLOY_TOKEN: "${{ secrets.DEPLOY_TOKEN }}"
+          GITHUB_DEPLOY_REPOSITORY: ${{ secrets.DEPLOY_REPOSITORY }}
         with:
           gradle-version: 8.0.2
           arguments: build
-        env:
-          GITHUB_DEPLOY_USER: ${{ github.actor }}
-          GITHUB_DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
-          GITHUB_DEPLOY_REPOSITORY: ${{ secrets.DEPLOY_REPOSITORY }}

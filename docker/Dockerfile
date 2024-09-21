@@ -10,7 +10,15 @@ ENV \
 	DB_USER="adempiere" \
 	DB_PASSWORD="adempiere" \
 	DB_TYPE="PostgreSQL" \
-	ADEMPIERE_APPS_TYPE=""
+	IDLE_TIMEOUT="300" \
+	MINIMUM_IDLE="1" \
+	MAXIMUM_POOL_SIZE="10" \
+	CONNECTION_TIMEOUT="5000" \
+	MAXIMUM_LIFETIME="6000" \
+	KEEPALIVE_TIME="360000" \
+	CONNECTION_TEST_QUERY="\"SELECT 1\"" \
+	SYSTEM_LOGO_URL="" \
+	TZ="America/Caracas"
 
 WORKDIR /opt/apps/server
 
@@ -21,8 +29,6 @@ COPY docker/start.sh /opt/apps/server/start.sh
 
 EXPOSE ${SERVER_PORT}
 
-# timezone
-ENV TZ America/Caracas
 
 # Add operative system dependencies
 RUN	apt-get update && apt-get install -y tzdata \
