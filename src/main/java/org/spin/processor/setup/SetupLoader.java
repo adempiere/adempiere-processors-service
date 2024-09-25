@@ -116,7 +116,7 @@ public class SetupLoader {
 		//	Minimum connection opening 1
 		BackendDatabaseConfig.setMinimumIdle(dataBase.getMinimum_idle());
 		//	10
-		BackendDatabaseConfig.setMaximumPoolSize(dataBase.getMaximum_pool_size() + 1);
+		BackendDatabaseConfig.setMaximumPoolSize(dataBase.getMaximum_pool_size());
 		//	New connection waiting time 5 seconds 5000
 		BackendDatabaseConfig.setConnectionTimeout(dataBase.getConnection_timeout());
 		//	Close connections after 10 minutes
