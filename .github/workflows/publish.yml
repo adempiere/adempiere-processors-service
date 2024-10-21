@@ -167,7 +167,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: docker/alpine.Dockerfile
+          file: docker/Dockerfile.alpine
           push: true
           tags: |
             ${{ secrets.DOCKER_HUB_REPO_NAME }}:alpine-${{ github.event.release.tag_name }}
