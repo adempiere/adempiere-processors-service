@@ -1,4 +1,7 @@
-FROM eclipse-temurin:11-jdk-focal
+FROM eclipse-temurin:11.0.24_8-jdk-focal
+
+LABEL maintainer="ySenih@erpya.com; EdwinBetanc0urt@outlook.com;" \
+	description="ADempiere Processors gRPC"
 
 # Init ENV with default values
 ENV \
@@ -20,6 +23,21 @@ ENV \
 	SYSTEM_LOGO_URL="" \
 	TZ="America/Caracas"
 
+EXPOSE ${SERVER_PORT}
+
+
+# Add operative system dependencies
+RUN	apt-get update && \
+	apt-get install -y \
+		tzdata \
+		bash \
+		fontconfig \
+		ttf-dejavu && \
+	rm -rf /var/lib/apt/lists/* \
+	echo "Set Timezone..." && \
+	echo $TZ > /etc/timezone
+
+
 WORKDIR /opt/apps/server
 
 # Copy src files
@@ -27,18 +45,8 @@ COPY docker/adempiere-processors-service /opt/apps/server
 COPY docker/env.yaml /opt/apps/server/env.yaml
 COPY docker/start.sh /opt/apps/server/start.sh
 
-EXPOSE ${SERVER_PORT}
 
-
-# Add operative system dependencies
-RUN	apt-get update && apt-get install -y tzdata \
-		bash \
-	 	fontconfig \
-		ttf-dejavu && \
-		rm -rf /var/lib/apt/lists/* \
-		echo "Set Timezone..." && \
-	 	echo $TZ > /etc/timezone
-
+# Add adempiere as user
 RUN addgroup adempiere && \
 	adduser --disabled-password --gecos "" --ingroup adempiere --no-create-home adempiere && \
 	chown -R adempiere /opt/apps/server/ && \
@@ -48,4 +56,3 @@ USER adempiere
 
 # Start app
 ENTRYPOINT ["sh" , "start.sh"]
-

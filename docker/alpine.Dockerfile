@@ -1,4 +1,7 @@
-FROM eclipse-temurin:11-jdk-alpine
+FROM eclipse-temurin:11.0.24_8-jdk-alpine
+
+LABEL maintainer="ySenih@erpya.com; EdwinBetanc0urt@outlook.com;" \
+	description="ADempiere Processors gRPC"
 
 # Init ENV with default values
 ENV \
@@ -20,13 +23,6 @@ ENV \
 	SYSTEM_LOGO_URL="" \
 	TZ="America/Caracas"
 
-WORKDIR /opt/apps/server
-
-# Copy src files
-COPY docker/adempiere-processors-service /opt/apps/server
-COPY docker/env.yaml /opt/apps/server/env.yaml
-COPY docker/start.sh /opt/apps/server/start.sh
-
 EXPOSE ${SERVER_PORT}
 
 
@@ -35,14 +31,23 @@ RUN	rm -rf /var/cache/apk/* && \
 	rm -rf /tmp/* && \
 	apk update && \
 	apk add --no-cache \
+		tzdata \
 		bash \
-	 	fontconfig \
+		fontconfig \
 		ttf-dejavu && \
-		echo "Set Timezone..." && \
-	 	echo $TZ > /etc/timezone && \
-                apk add --no-cache \
-		tzdata
+	echo "Set Timezone..." && \
+	echo $TZ > /etc/timezone
 
+
+WORKDIR /opt/apps/server
+
+# Copy src files
+COPY docker/adempiere-processors-service /opt/apps/server
+COPY docker/env.yaml /opt/apps/server/env.yaml
+COPY docker/start.sh /opt/apps/server/start.sh
+
+
+# Add adempiere as user
 RUN addgroup adempiere && \
 	adduser --disabled-password --gecos "" --ingroup adempiere --no-create-home adempiere && \
 	chown -R adempiere /opt/apps/server/ && \
@@ -52,4 +57,3 @@ USER adempiere
 
 # Start app
 ENTRYPOINT ["sh" , "start.sh"]
-
