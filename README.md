@@ -61,7 +61,7 @@ To use this Docker image you must have your Docker engine version greater than o
  * `SERVER_PORT`: Port to access Adempiere-Backend from outside of the container. Default: `50059`.
  * `SERVER_LOG_LEVEL`: Log Level. Default: `WARNING`.
  * `TZ`: (Time Zone) Indicates the time zone to set in the nginx-based container, the default value is `America/Caracas` (UTC -4:00).
- * `JAVA_OPTIONS`: Custom settings to the Java Virtual Machine (JVM) .
+ * `JAVA_OPTIONS`: Custom settings to the Java Virtual Machine (JVM). Default: `-Xms64M -Xmx1512M`.
 
 You can download the last image from docker hub, just run the follow command:
 
