@@ -28,6 +28,15 @@ jobs:
           java-version: 11
           architecture: x64
 
+      - name: Set Main Version
+        run: echo "MAIN_VERSION=${{ github.event.release.name }}" >> src/main/java/org/spin/base/version.properties
+
+      - name: Set Release Date
+        run: echo "DATE_VERSION=$(date +'%Y-%m-%d')" >> src/main/java/org/spin/base/version.properties
+
+      - name: Set Implementation Version
+        run: echo "IMPLEMENTATION_VERSION=${{ github.event.release.tag_name }}" >> src/main/java/org/spin/base/version.properties
+
       - name: Build with Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
@@ -46,6 +55,7 @@ jobs:
         with:
           name: adempiere-processors-service.dsc
           path: build/descriptors/adempiere-processors-service.dsc
+          retention-days: 1
 
       - name: Upload dist app zip artifact
         uses: actions/upload-artifact@v4
