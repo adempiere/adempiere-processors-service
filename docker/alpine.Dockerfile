@@ -27,14 +27,14 @@ EXPOSE ${SERVER_PORT}
 
 
 # Add operative system dependencies
-RUN	rm -rf /var/cache/apk/* && \
-	rm -rf /tmp/* && \
-	apk update && \
+RUN	apk update && \
 	apk add --no-cache \
 		tzdata \
 		bash \
 		fontconfig \
 		ttf-dejavu && \
+	rm -rf /var/cache/apk/* && \
+	rm -rf /tmp/* && \
 	echo "Set Timezone..." && \
 	echo $TZ > /etc/timezone
 
