@@ -24,6 +24,7 @@ import org.compiere.util.Env;
 import org.compiere.util.Msg;
 import org.compiere.util.Util;
 import org.eevolution.services.dsl.ProcessBuilder;
+import org.spin.base.Version;
 import org.spin.eca46.process.AcctProcessor;
 import org.spin.eca46.process.AlertProcessor;
 import org.spin.eca46.process.ProjectProcessor;
@@ -32,10 +33,37 @@ import org.spin.eca46.process.SchedulerProcessor;
 import org.spin.eca46.process.WorkflowProcessor;
 import org.spin.proto.processor.ProcessorLog;
 import org.spin.proto.processor.RunProcessorResponse;
+import org.spin.proto.processor.SystemInfo;
+import org.spin.service.grpc.util.value.StringManager;
+import org.spin.service.grpc.util.value.TimeManager;
 import org.spin.service.grpc.util.value.ValueManager;
 
 public class Service {
-	
+
+	public static SystemInfo.Builder getSystemInfo() {
+		SystemInfo.Builder builder = SystemInfo.newBuilder();
+		// backend info
+		builder.setDateVersion(
+				ValueManager.getTimestampFromDate(
+					TimeManager.getTimestampFromString(
+						Version.DATE_VERSION
+					)
+				)
+			)
+			.setMainVersion(
+				StringManager.getValidString(
+					Version.MAIN_VERSION
+				)
+			)
+			.setImplementationVersion(
+				StringManager.getValidString(
+					Version.IMPLEMENTATION_VERSION
+				)
+			)
+		;
+		return builder;
+	}
+
 	public static RunProcessorResponse.Builder runAccounting(int clientId, int id) {
 		return runProcess(AcctProcessor.getProcessId(), AcctProcessor.C_ACCTPROCESSOR_ID, clientId, id);
 	}
@@ -104,7 +132,11 @@ public class Service {
 			//	Set error message
 			String summary = Msg.parseTranslation(Env.getCtx(), result.getSummary());
 			if(Util.isEmpty(summary, true)) {
-				result.setSummary(ValueManager.validateNull(e.getLocalizedMessage()));
+				result.setSummary(
+					StringManager.getValidString(
+						e.getLocalizedMessage()
+					)
+				);
 			}
 		}
 		//	

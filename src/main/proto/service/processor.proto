@@ -4,8 +4,19 @@ option java_package = "org.spin.proto.processor";
 option java_multiple_files = true;
 
 import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
 
 package processor;
+
+message GetSystemInfoRequest {
+	// empty request
+}
+message SystemInfo {
+	// report service
+	google.protobuf.Timestamp date_version = 1;
+	string main_version = 2;
+	string implementation_version = 3;
+}
 
 // Delete Batch Entity Request
 message RunProcessorRequest {
@@ -27,6 +38,13 @@ message ProcessorLog {
 
 // The greeting service definition.
 service Processors {
+	// system information
+	rpc GetSystemInfo(GetSystemInfoRequest) returns (SystemInfo) {
+		option (google.api.http) = {
+			get: "/v1/processors/system-info"
+		};
+	}
+
 	// Accounting Processor
 	rpc RunAccounting(RunProcessorRequest) returns (RunProcessorResponse) {
 		option (google.api.http) = { post: "/v1/accounting/{client_id}/{id}" };
