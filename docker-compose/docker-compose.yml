@@ -1,7 +1,6 @@
-version: "3.9"
 
 services:
-  adempiere.db:
+  adempiere-db:
     container_name: ${POSTGRES_NAME}
     image: ${POSTGRES_IMAGE}
     restart: ${GENERIC_RESTART}
@@ -22,7 +21,7 @@ services:
     networks:
       - shared_network
 
-  adempiere.processor:
+  adempiere-processor:
     image: ${ADEMPIERE_PROCESSOR_IMAGE}
     container_name: ${ADEMPIERE_PROCESSOR_HOST}
     restart: ${GENERIC_RESTART}
@@ -32,15 +31,19 @@ services:
       retries: 60
       start_period: 20s
       timeout: 10s
+    secrets:
+      - adempiere_db_password
     environment:
       DB_HOST: ${POSTGRES_NAME}
+      # DB_PASSWORD: ${ADEMPIERE_ZK_DB_PASSWORD}
+      DB_PASSWORD_FILE: /run/secrets/adempiere_db_password
     depends_on:
-      adempiere.db:
+      adempiere-db:
         condition: service_healthy
     networks:
       - shared_network
 
-  dkron.scheduler:
+  dkron-scheduler:
     image: ${DKRON_IMAGE}
     container_name: ${DKRON_HOST}
     restart: ${GENERIC_RESTART}
@@ -51,40 +54,43 @@ services:
       - "--bootstrap-expect=1"
       - "--node-name=node1"
       - "--server"
-#      - "--ui=false"
+      # - "--ui=false"
     volumes:
       - volume_dkron:/dkron.data
     networks:
       - shared_network
-      
-  adempiere.zk:
+
+  adempiere-zk:
     image: ${ADEMPIERE_ZK_IMAGE}
     container_name: ${ADEMPIERE_ZK_HOST}
     restart: ${GENERIC_RESTART}
     ports:
       - ${ADEMPIERE_ZK_PORT}:8080
+    secrets:
+      - adempiere_db_password
     environment:
       ADEMPIERE_DB_SERVER: ${ADEMPIERE_ZK_DB_HOST}
       ADEMPIERE_DB_NAME: ${ADEMPIERE_ZK_DB_NAME}
-      ADEMPIERE_DB_PASSWORD: ${ADEMPIERE_ZK_DB_PASSWORD}
+      # ADEMPIERE_DB_PASSWORD: ${ADEMPIERE_ZK_DB_PASSWORD}
+      ADEMPIERE_DB_PASSWORD_FILE: /run/secrets/adempiere_db_password
     depends_on:
-      adempiere.db:
+      adempiere-db:
         condition: service_healthy
     networks:
       - shared_network
 
-  grpc.proxy:
-      image: ${ENVOY_IMAGE_NAME}
-      container_name: ${ENVOY_NAME}
-      volumes:
-          - ./envoy/envoy.yaml:/etc/envoy/envoy.yaml:ro
-          - ./envoy/definitions/adempiere-processors-service.dsc:/data/adempiere-processors-service.dsc:ro
-      depends_on:
-        - adempiere.processor
-      ports:
-        - ${ENVOY_PORT}:5555
-      networks:
-        - shared_network
+  grpc-proxy:
+    image: ${ENVOY_IMAGE_NAME}
+    container_name: ${ENVOY_NAME}
+    volumes:
+        - ./envoy/envoy.yaml:/etc/envoy/envoy.yaml:ro
+        - ./envoy/definitions/adempiere-processors-service.dsc:/data/adempiere-processors-service.dsc:ro
+    depends_on:
+      - adempiere-processor
+    ports:
+      - ${ENVOY_PORT}:5555
+    networks:
+      - shared_network
 
 
 networks:
@@ -96,3 +102,7 @@ volumes:
     name: ${POSTGRES_VOLUME}
   volume_dkron:
     name: ${DKRON_VOLUME}
+
+secrets:
+  adempiere_db_password:
+    file: ./secrets/adempiere_db_password.txt
