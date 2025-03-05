@@ -50,14 +50,15 @@ To use this Docker image you must have your Docker engine version greater than o
  * `DB_PORT`: Port used by data base server. Default: `5432`.
  * `DB_NAME`: Database name that Adempiere-Backend will use to connect with the database. Default: `adempiere`.
  * `DB_USER`: Database user that Adempiere-Backend will use to connect with the database. Default: `adempiere`.
- * `DB_PASSWORD`: Database password that Adempiere-Backend will use to connect with the database. Default: `adempiere`.
+ * `DB_PASSWORD`: Database password that Adempiere-Backend will use to connect with the database. Default: `adempiere`. For added security, implement secrets with `DB_PASSWORD_FILE`.
+ * `DB_PASSWORD_FILE`: Database password that Adempiere-Backend will use to connect with the database. This overrides `DB_PASSWORD` but if not defined no secrets will be implemented in the password but instead the value of the environment variable will be used.
  * `IDLE_TIMEOUT`: It sets the maximum time a connection can sit around without being used before it gets closed to free up resources. Default: `300`.
  * `MINIMUM_IDLE`: It sets the minimum number of connections that should be kept open and ready to use, even if they're not currently being used. This helps improve performance by reducing the time it takes to get a connection. Default: `1`.
  * `MAXIMUM_POOL_SIZE`: It sets the maximum number of connections that can be open at the same time. This helps prevent the pool from getting too big and using up too much memory. Default: `10`.
  * `CONNECTION_TIMEOUT`: it sets the maximum time HikariCP will wait to get a connection from the pool before giving up and throwing an error. Default: `5000`.
  * `MAXIMUM_LIFETIME`: It sets the maximum amount of time a connection can stay open in the pool before it's automatically closed. This helps keep the pool clean and prevents problems. Default: `6000`.
  * `KEEPALIVE_TIME`: It sets a test query that HikariCP will run on connections to make sure they're still working properly. Default: `360000`.
- * `CONNECTION_TEST_QUERY`: It sets how often HikariCP will check if a connection is still working properly. This helps prevent problems with connections that might become inactive. Default: `SELECT 1`
+ * `CONNECTION_TEST_QUERY`: It sets how often HikariCP will check if a connection is still working properly. This helps prevent problems with connections that might become inactive. Default: `SELECT 1`.
  * `SERVER_PORT`: Port to access Adempiere-Backend from outside of the container. Default: `50059`.
  * `SERVER_LOG_LEVEL`: Log Level. Default: `WARNING`.
  * `TZ`: (Time Zone) Indicates the time zone to set in the nginx-based container, the default value is `America/Caracas` (UTC -4:00).
