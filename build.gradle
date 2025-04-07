@@ -132,7 +132,7 @@ dependencies {
 	//implementation 'javax.activation:activation:1.1.1'
 	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.0'
 	//  SHW Libraries
-     implementation "com.shw:lsv-general:1.0.15"
+     implementation 'com.shw:adempiere-shw.shw_libs:3.9.4.001-1.1.23'
 	//	Others
     compileOnly 'org.apache.tomcat:annotations-api:6.0.53'
 }
