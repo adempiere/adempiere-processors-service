@@ -17,7 +17,9 @@ package org.spin.processor.controller;
 import org.compiere.util.CLogger;
 import org.spin.proto.processor.RunProcessorRequest;
 import org.spin.proto.processor.RunProcessorResponse;
+import org.spin.proto.processor.SystemInfo;
 import org.spin.processor.service.Service;
+import org.spin.proto.processor.GetSystemInfoRequest;
 import org.spin.proto.processor.ProcessorsGrpc.ProcessorsImplBase;
 
 import io.grpc.Status;
@@ -27,8 +29,24 @@ public class Processors extends ProcessorsImplBase {
 	
 	/**	Logger			*/
 	private CLogger log = CLogger.getCLogger(Processors.class);
-	
-	
+
+
+	@Override
+	public void getSystemInfo(GetSystemInfoRequest request, StreamObserver<SystemInfo> responseObserver) {
+		try {
+			SystemInfo.Builder builder = Service.getSystemInfo();
+			responseObserver.onNext(builder.build());
+			responseObserver.onCompleted();
+		} catch (Exception e) {
+			log.severe(e.getLocalizedMessage());
+			responseObserver.onError(Status.INTERNAL
+				.withDescription(e.getLocalizedMessage())
+				.withCause(e)
+				.asRuntimeException()
+			);
+		}
+	}
+
 	@Override
 	public void runAccounting(RunProcessorRequest request, StreamObserver<RunProcessorResponse> responseObserver) {
 		try {

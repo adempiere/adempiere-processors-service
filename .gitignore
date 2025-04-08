@@ -23,5 +23,9 @@
 hs_err_pid*
 /bin/
 /.gradle/
+/libs/
+/dependences/
 /build/
 *.properties
+# skip folder dependencies
+!dependencies/*.jar

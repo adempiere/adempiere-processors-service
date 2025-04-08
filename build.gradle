@@ -5,13 +5,18 @@ plugins {
     id 'application'
     id 'visual-studio'
 }
+
 group 'com.nikhilm'
+
 sourceCompatibility = 1.11
+
 def grpcVersion = '1.62.2'
 def protobufVersion = '3.25.3'
 def baseVersion = '3.9.4'
 def baseGroupId = 'io.github.adempiere'
 def privateDependencyBaseVersion = "adempiere-3.9.4"
+def descriptorFile = "adempiere-processors-service.dsc"
+
 startScripts.enabled = false
 
 ext {
@@ -30,23 +35,34 @@ jar {
 }
 
 repositories {
+	mavenLocal()
     mavenCentral()
-    mavenLocal()
     maven {
-    	url = "https://maven.pkg.github.com/Systemhaus-Westfalia/adempiere-shw"
-        credentials {
-        	username = findProperty("deployUsername") ?: System.properties['deploy.user']
-            password = findProperty("deployToken") ?: System.properties['deploy.token']
+		url = "https://maven.pkg.github.com/Systemhaus-Westfalia/adempiere-shw"
+		credentials {
+			username = findProperty("deployUsername") ?: System.properties['deploy.user'] ?: System.getenv("GITHUB_DEPLOY_USER")
+			password = findProperty("deployToken") ?: System.properties['deploy.token'] ?: System.getenv("GITHUB_DEPLOY_TOKEN")
 		}
 	}
-    maven {
-    	url = "https://maven.pkg.github.com/adempiere/adempiere"
-        credentials {
-        	username = findProperty("deployUsername") ?: System.properties['deploy.user']
-            password = findProperty("deployToken") ?: System.properties['deploy.token']
+	// ERP Repos
+	maven {
+		url = "https://maven.pkg.github.com/erpya/repository"
+		credentials {
+			username = findProperty("deployUsername") ?: System.properties['deploy.user'] ?: System.getenv("GITHUB_DEPLOY_USER")
+			password = findProperty("deployToken") ?: System.properties['deploy.token'] ?: System.getenv("GITHUB_DEPLOY_TOKEN")
+		}
+	}
+	maven {
+		// Adempiere GitHub Organization
+		url = findProperty("deployRepository") ?: System.properties['deploy.repository'] ?: System.getenv("GITHUB_DEPLOY_REPOSITORY") ?: 'https://maven.pkg.github.com/adempiere/adempiere'
+		credentials {
+			// project property, system property, enviroment variable
+			username = findProperty("deployUsername") ?: System.properties['deploy.user'] ?: System.getenv("GITHUB_DEPLOY_USER")
+			password = findProperty("deployToken") ?: System.properties['deploy.token'] ?: System.getenv("GITHUB_DEPLOY_TOKEN")
 		}
 	}
 }
+
 protobuf {
     protoc {
 		artifact = "com.google.protobuf:protoc:${protobufVersion}"
@@ -61,34 +77,55 @@ protobuf {
             grpc {}
         }
         all().configureEach { task ->
-      		  // If true, will generate a descriptor_set.desc file under
-			  // task.outputBaseDir. Default is false.
-			  // See --descriptor_set_out in protoc documentation about what it is.
-			  task.generateDescriptorSet = true
+			// If true, will generate a descriptor_set.desc file under
+			// task.outputBaseDir. Default is false.
+			// See --descriptor_set_out in protoc documentation about what it is.
+			task.generateDescriptorSet = true
 			
-			  // Allows to override the default for the descriptor set location
-			  task.descriptorSetOptions.path =
-			    "${projectDir}/build/descriptors/adempiere-processors-service-service.pb"
+			// Allows to override the default for the descriptor set location
+			task.descriptorSetOptions.path = "${projectDir}/build/descriptors/${descriptorFile}"
+			// task.descriptorSetOptions.path = "${projectDir}/build/descriptors/adempiere-processors-service.dsc"
 			
-			  // If true, the descriptor set will contain line number information
-			  // and comments. Default is false.
-			  task.descriptorSetOptions.includeSourceInfo = true
+			// If true, the descriptor set will contain line number information
+			// and comments. Default is false.
+			task.descriptorSetOptions.includeSourceInfo = true
 			
-			  // If true, the descriptor set will contain all transitive imports and
-			  // is therefore self-contained. Default is false.
-			  task.descriptorSetOptions.includeImports = true
-    	}
-    }
+			// If true, the descriptor set will contain all transitive imports and
+			// is therefore self-contained. Default is false.
+			task.descriptorSetOptions.includeImports = true
+		}
+	}
 }
+
 sourceSets {
-    main {
-        java {
-            srcDirs 'build/generated/source/proto/main/grpc'
-            srcDirs 'build/generated/source/proto/main/java'
-            srcDirs 'src/main/proto'
-        }
-    }
+	main {
+		java {
+			srcDirs 'build/generated/source/proto/main/grpc'
+			srcDirs 'build/generated/source/proto/main/java'
+			srcDirs 'src/main/proto'
+		}
+		resources {
+			srcDirs 'src/main/java'
+			include 'org/spin/base/version.properties'
+		}
+	}
 }
+
+// Copy proto descriptor another folder
+allprojects {
+	task copyDescriptor(type: Copy) {
+		from "${projectDir}/build/descriptors/${descriptorFile}"
+		into "${projectDir}/docker-compose/envoy/definitions"
+		// rename { "${descriptorFile}" }
+	}
+
+	tasks.matching {
+		it.name.startsWith('compileJava')
+	}.each { task ->
+		task.finalizedBy copyDescriptor
+	}
+}
+
 task AdempiereProcessorServer(type: CreateStartScripts) {
 	mainClass = javaMainClass
     applicationName = 'adempiere-processors-service-server'
@@ -122,15 +159,16 @@ dependencies {
             '*.jar'
         ]
     )
-    implementation "io.grpc:grpc-netty-shaded:${grpcVersion}"
-    implementation "io.grpc:grpc-alts:${grpcVersion}"
-    implementation "io.netty:netty-handler:4.1.107.Final"
-    implementation "io.grpc:grpc-protobuf:${grpcVersion}"
-    implementation "io.grpc:grpc-stub:${grpcVersion}"
-    implementation "io.grpc:grpc-netty:${grpcVersion}"
-    // https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java
+	implementation "io.grpc:grpc-netty-shaded:${grpcVersion}"
+	implementation "io.grpc:grpc-alts:${grpcVersion}"
+	implementation "io.netty:netty-handler:4.1.107.Final"
+	implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+	implementation "io.grpc:grpc-stub:${grpcVersion}"
+	implementation "io.grpc:grpc-netty:${grpcVersion}"
+	// https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java
 	implementation "com.google.protobuf:protobuf-java:${protobufVersion}"
 	implementation "com.google.protobuf:protobuf-java-util:${protobufVersion}"
+
     implementation "io.jsonwebtoken:jjwt-api:0.12.6"
 	implementation "io.jsonwebtoken:jjwt-impl:0.12.6"
 	implementation "io.jsonwebtoken:jjwt-jackson:0.12.6"
@@ -142,10 +180,10 @@ dependencies {
 
 	//	ADempiere Core
 	implementation "${baseGroupId}:base:${baseVersion}"
-	//implementation "${baseGroupId}:adempiere-grpc-utils:1.5.6"
-	//implementation "${baseGroupId}:adempiere-business-processors:1.1.8"
-	//  SHW Libraries
-        //implementation 'com.shw:adempiere-shw.shw_libs:3.9.4.001-1.1.23'
+	// implementation "${baseGroupId}:adempiere-grpc-utils:1.5.6"
+	// implementation "${baseGroupId}:adempiere-business-processors:1.1.8"
 	//	Others
     compileOnly 'org.apache.tomcat:annotations-api:6.0.53'
+	//	SHW Libraries
+	implementation 'com.shw:adempiere-shw.shw_libs:3.9.4.001-1.1.23'
 }

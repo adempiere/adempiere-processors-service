@@ -1,6 +1,6 @@
 static_resources:
   listeners:
-  - name: adempiere_grpc_server
+  - name: adempiere_processor_proxy
     address:
       socket_address: {
         address: 0.0.0.0,
@@ -12,7 +12,12 @@ static_resources:
         typed_config:
           "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
           stat_prefix: grpc_json
+          access_log:
+          - name: envoy.access_loggers.stdout
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.access_loggers.stream.v3.StdoutAccessLog
           codec_type: AUTO
+          stream_idle_timeout: 900s
           route_config:
             name: local_route
             virtual_hosts:
@@ -23,14 +28,14 @@ static_resources:
                   prefix: "/"
                 }
                 route: {
-                  cluster: adempiere-grpc-server,
-                  timeout: 60s
+                  cluster: adempiere_processor_cluster,
+                  timeout: 900s
                 }
           http_filters:
           - name: envoy.filters.http.grpc_json_transcoder
             typed_config:
               "@type": type.googleapis.com/envoy.extensions.filters.http.grpc_json_transcoder.v3.GrpcJsonTranscoder
-              proto_descriptor: "/data/adempiere-processors-service-service.pb"
+              proto_descriptor: "/data/adempiere-processors-service.dsc"
               services:
                 - processor.Processors
               print_options:
@@ -39,12 +44,13 @@ static_resources:
                 always_print_enums_as_ints: false
                 preserve_proto_field_names: true
               convert_grpc_status: true
+              ignore_unknown_query_parameters: true
           - name: envoy.filters.http.router
             typed_config:
               "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
 
   clusters:
-  - name: adempiere-grpc-server
+  - name: adempiere_processor_cluster
     type: LOGICAL_DNS
     lb_policy: ROUND_ROBIN
     dns_lookup_family: V4_ONLY
@@ -54,7 +60,7 @@ static_resources:
         explicit_http_config:
           http2_protocol_options: {}
     load_assignment:
-      cluster_name: adempiere-grpc-server
+      cluster_name: adempiere_processor_cluster
       endpoints:
       - lb_endpoints:
         - endpoint:
