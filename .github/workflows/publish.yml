@@ -37,11 +37,13 @@ jobs:
       - name: Set Implementation Version
         run: echo "IMPLEMENTATION_VERSION=${{ github.event.release.tag_name }}" >> src/main/java/org/spin/base/version.properties
 
-      - name: Build with Gradle
-        uses: gradle/actions/setup-gradle@v3
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: 8.0.2
-          arguments: createRelease
+          gradle-version: current # 8.0.2
+
+      - name: Create Release with Gradle
+        run: gradle createRelease
         env:
           ORG_GRADLE_PROJECT_deployUsername: ${{ secrets.DEPLOY_USER }}
           ORG_GRADLE_PROJECT_deployToken: ${{ secrets.DEPLOY_TOKEN }}

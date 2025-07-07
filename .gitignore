@@ -29,3 +29,6 @@ hs_err_pid*
 *.properties
 # skip folder dependencies
 !dependencies/*.jar
+
+# Enviroment variable file
+.env
