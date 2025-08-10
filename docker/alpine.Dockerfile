@@ -1,4 +1,4 @@
-FROM eclipse-temurin:11.0.24_8-jdk-alpine
+FROM eclipse-temurin:17.0.16_8-jdk-alpine-3.22
 
 LABEL maintainer="ySenih@erpya.com; EdwinBetanc0urt@outlook.com;" \
 	description="ADempiere Processors gRPC"
