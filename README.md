@@ -101,7 +101,11 @@ docker compose up
 
 You can change variables editing the `.env` file. Note that this file have a minimal example.
 
+
 ## What else?
+
+## Requirements
+To execute correctly, the role associated with the generated token must have minimal access to the processes.
 
 Just run it using any gRPC client or Rest API client with envoy
 

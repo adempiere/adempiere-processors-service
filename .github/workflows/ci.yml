@@ -47,8 +47,13 @@ jobs:
           java-version: 11
           architecture: x64
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: current # 8.0.2
+
       - name: Build with Gradle
-        uses: gradle/actions/setup-gradle@v3
+        run: gradle build
         env:
           ORG_GRADLE_PROJECT_deployUsername: ${{ secrets.DEPLOY_USER }}
           ORG_GRADLE_PROJECT_deployToken: ${{ secrets.DEPLOY_TOKEN }}
@@ -56,6 +61,4 @@ jobs:
           GITHUB_DEPLOY_USER: ${{ github.actor }}
           GITHUB_DEPLOY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_DEPLOY_REPOSITORY: ${{ secrets.DEPLOY_REPOSITORY }}
-        with:
-          gradle-version: 8.0.2
-          arguments: build
+
