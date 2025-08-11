@@ -32,7 +32,7 @@ RUN	apt-get update && \
 		tzdata \
 		bash \
 		fontconfig \
-		ttf-dejavu && \
+		fonts-dejavu && \
 	rm -rf /var/lib/apt/lists/* \
 	rm -rf /tmp/* && \
 	echo "Set Timezone..." && \
