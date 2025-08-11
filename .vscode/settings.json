@@ -1,3 +1,18 @@
 {
-    "java.configuration.updateBuildConfiguration": "interactive"
+	"editor.detectIndentation": true,
+	"editor.indentSize": "tabSize",
+	"editor.tabSize": 4,
+	"editor.autoIndent": "full",
+	"editor.renderWhitespace": "boundary",
+	"files.exclude": {
+		"**/.git": true,
+		"**/.DS_Store": true,
+		"build": true
+	},
+	"files.insertFinalNewline": true,
+	"java.autobuild.enabled": true,
+	"java.compile.nullAnalysis.mode": "disabled",
+	"java.configuration.updateBuildConfiguration": "interactive",
+	"java.debug.settings.hotCodeReplace": "auto",
+	"java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx8G -Xms100m -Xlog:disable"
 }

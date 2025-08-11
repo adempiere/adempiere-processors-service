@@ -16,7 +16,6 @@ def baseGroupId = 'io.github.adempiere'
 def privateDependencyBaseVersion = "adempiere-3.9.4"
 def descriptorFile = "adempiere-processors-service.dsc"
 
-startScripts.enabled = false
 
 ext {
 	javaMainClass = "org.spin.processor.server.ProcessorServer"
@@ -25,10 +24,19 @@ ext {
 
 java {
 	sourceCompatibility = JavaVersion.VERSION_11
-	// targetCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
 }
+
 application {
 	mainClass.set(javaMainClass)
+
+	// distribution output
+	distributions {
+		main {
+			contents {
+			}
+		}
+	}
 }
 jar {
 	manifest {
@@ -104,12 +112,53 @@ sourceSets {
 	}
 }
 
+run {
+	doFirst {
+		// Set environment variables
+		environment 'JWT_SECRET_KEY', '52D11677CBB494878FD6E93B5A6615052A93B8AC654DE543CC4F53BA56027B1C'
+		environment 'JWT_EXPIRATION_TIME', 86400000
+		environment 'TZ', 'America/Caracas'
+	}
+	args = [
+		"resources/env.yaml"
+	]
+}
+
+startScripts {
+	applicationName = 'start-backend'
+
+	// default JVM setting
+	defaultJvmOpts = [
+		"-DPropertyFile=Adempiere.properties", 
+		"-Dorg.adempiere.server.embedded=true"
+	]
+	outputDir = new File(project.buildDir, 'tmp')
+	classpath = jar.outputs.files + project.configurations.runtimeClasspath
+
+	// Configure script names with extensions
+	doLast {
+		def unixScript = file(getUnixScript())
+		def windowsScript = file(getWindowsScript())
+
+		// Rename files after generating them
+		unixScript.renameTo("${unixScript.parent}/${applicationName}.sh")
+		windowsScript.renameTo("${windowsScript.parent}/${applicationName}.bat")
+
+		// Configure permissions for generated scripts
+		unixScript.setExecutable(true, false)
+		// windowsScript.setExecutable(true, false)
+	}
+}
+
 // Copy proto descriptor another folder
 allprojects {
 	task copyDescriptor(type: Copy) {
 		from "${projectDir}/build/descriptors/${descriptorFile}"
 		into "${projectDir}/docker-compose/envoy/definitions"
 		// rename { "${descriptorFile}" }
+
+		// task dependency
+		dependsOn "generateTestProto"
 	}
 
 	tasks.matching {
@@ -119,16 +168,12 @@ allprojects {
 	}
 }
 
-task AdempiereProcessorServer(type: CreateStartScripts) {
-	mainClass = javaMainClass
-    applicationName = 'adempiere-processors-service-server'
-    outputDir = new File(project.buildDir, 'tmp')
-    classpath = jar.outputs.files + project.configurations.runtimeClasspath
+// compressed files task
+distTar {
+	dependsOn compileTestJava, copyDescriptor, startScripts
 }
-
-applicationDistribution.into('bin') {
-	from(AdempiereProcessorServer)
-    fileMode = 0755
+distZip {
+	dependsOn compileTestJava, copyDescriptor, startScripts
 }
 
 //	Create release for project
@@ -145,6 +190,11 @@ task createRelease(type: Copy) {
         }
    	}
 }
+
+task cleanBuild(type: GradleBuild) {
+	tasks = ['clean', 'build']
+}
+
 dependencies {
 	implementation fileTree(
         dir: 'dependencies',
