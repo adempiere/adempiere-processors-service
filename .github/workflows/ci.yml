@@ -6,6 +6,10 @@
 
 name: Continuous Integration with Gradle
 
+permissions:
+  contents: write # to upload release assets
+  packages: write # to publish packages
+
 on:
   push:
     branches:
@@ -47,7 +51,7 @@ jobs:
           java-version: 17
           architecture: x64
 
-      - name: Setup Gradle
+      - name: Setup Gradle 9
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: current # 9.0.0
