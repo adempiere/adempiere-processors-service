@@ -204,7 +204,7 @@ jobs:
   # TODO: Download .tar and add docker image without uncompress
   # Publish docker multiplatform image in Docker Hub Registry to application
   push-imame-dhr:
-    name: Push docker multiplatform image to Docker Hub
+    name: Push docker ubuntu multiplatform image to Docker Hub
     needs:
       - check-docker-secrets
     # Skip step based on secret
