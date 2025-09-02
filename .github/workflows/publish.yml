@@ -35,7 +35,7 @@ jobs:
       - name: Setup Gradle 9
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: current # 9.0.0
+          gradle-version: 9.0.0 # current
 
       - name: Set Version Properties
         run: |
@@ -44,7 +44,7 @@ jobs:
           echo "IMPLEMENTATION_VERSION=${{ github.event.release.tag_name }}" >> src/main/java/org/spin/base/version.properties
 
       - name: Create Release with Gradle
-        run: gradle createRelease
+        run: gradle createRelease --warning-mode all --stacktrace
         env:
           ORG_GRADLE_PROJECT_deployUsername: ${{ secrets.DEPLOY_USER }}
           ORG_GRADLE_PROJECT_deployToken: ${{ secrets.DEPLOY_TOKEN }}
@@ -58,6 +58,7 @@ jobs:
           mkdir -p flat_artifacts/
           cp build/descriptors/adempiere-processors-service.dsc flat_artifacts/ || echo "Warning: .dsc file not found"
           cp build/release/adempiere-processors-service.* flat_artifacts/ || echo "Warning: release files not found"
+          cp docker-compose/envoy/envoy.yaml flat_artifacts/ || echo "Warning: envoy.yaml not found"
           cp resources/env.yaml flat_artifacts/ || echo "Warning: env.yaml not found"
           ls -la flat_artifacts/
 
@@ -81,17 +82,22 @@ jobs:
           name: release-artifacts
           path: artifacts/
 
+      - name: List Assets
+        run: |
+          tree artifacts
+
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.event.release.tag_name }}
           files: |
             artifacts/adempiere-processors-service.dsc
-            artifacts/adempiere-processors-service.zip
-            artifacts/adempiere-processors-service.zip.MD5
-            artifacts/adempiere-processors-service.tar
-            artifacts/adempiere-processors-service.tar.MD5
+            artifacts/envoy.yaml
             artifacts/env.yaml
+            artifacts/adempiere-processors-service.zip.MD5
+            artifacts/adempiere-processors-service.zip
+            artifacts/adempiere-processors-service.tar.MD5
+            artifacts/adempiere-processors-service.tar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -132,7 +138,6 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v4
 
-
       - name: Download dist artifacts
         uses: actions/download-artifact@v4
         with:
@@ -141,6 +146,7 @@ jobs:
 
       - name: Unzip Asset
         run: |
+          tree artifacts
           unzip artifacts/adempiere-processors-service.zip -d docker/
 
       - name: Login to Container Registry
@@ -193,6 +199,7 @@ jobs:
 
       - name: Unzip Asset
         run: |
+          tree artifacts
           unzip artifacts/adempiere-processors-service.zip -d docker/
 
       - name: Setup QEMU
