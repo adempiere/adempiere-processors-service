@@ -1,41 +1,41 @@
 static_resources:
   listeners:
-  - name: adempiere_processor_proxy
+  - name: adempiere_template_transcoding_proxy
     address:
       socket_address: {
         address: 0.0.0.0,
         port_value: 5555
       }
+    per_connection_buffer_limit_bytes: 94371840 # 90 MiB
     filter_chains:
     - filters:
       - name: envoy.filters.network.http_connection_manager
         typed_config:
           "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
           stat_prefix: grpc_json
-          access_log:
-          - name: envoy.access_loggers.stdout
-            typed_config:
-              "@type": type.googleapis.com/envoy.extensions.access_loggers.stream.v3.StdoutAccessLog
           codec_type: AUTO
-          stream_idle_timeout: 900s
           route_config:
             name: local_route
             virtual_hosts:
             - name: local_service
               domains: ["*"]
               routes:
+              # NOTE: by default, matching happens based on the gRPC route, and not on the incoming request path.
+              # Reference: https://envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/grpc_json_transcoder_filter#route-configs-for-transcoded-requests
+              # https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/grpc_json_transcoder_filter#sample-envoy-configuration
               - match: {
-                  prefix: "/"
+                  prefix: "/",
+                  grpc: {}
                 }
                 route: {
-                  cluster: adempiere_processor_cluster,
-                  timeout: 900s
+                  cluster: adempiere_template_cluster,
+                  timeout: 60s
                 }
           http_filters:
           - name: envoy.filters.http.grpc_json_transcoder
             typed_config:
               "@type": type.googleapis.com/envoy.extensions.filters.http.grpc_json_transcoder.v3.GrpcJsonTranscoder
-              proto_descriptor: "/data/adempiere-processors-service.dsc"
+              proto_descriptor: "/data/descriptor.dsc"
               services:
                 # package.service
                 - processor.Processors
@@ -51,7 +51,7 @@ static_resources:
               "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
 
   clusters:
-  - name: adempiere_processor_cluster
+  - name: adempiere_template_cluster
     type: LOGICAL_DNS
     lb_policy: ROUND_ROBIN
     dns_lookup_family: V4_ONLY
@@ -61,7 +61,7 @@ static_resources:
         explicit_http_config:
           http2_protocol_options: {}
     load_assignment:
-      cluster_name: adempiere_processor_cluster
+      cluster_name: adempiere_template_cluster
       endpoints:
       - lb_endpoints:
         - endpoint:
@@ -70,5 +70,5 @@ static_resources:
                 # WARNING: "docker.for.mac.localhost" has been deprecated from Docker v18.03.0.
                 # If you're running an older version of Docker, please use "docker.for.mac.localhost" instead.
                 # Reference: https://docs.docker.com/docker-for-mac/release-notes/#docker-community-edition-18030-ce-mac59-2018-03-26
-                address: adempiere-processor # for local testing change for your ip
-                port_value: 50059
+                address: backend_host # for local testing change for your ip
+                port_value: backend_port
