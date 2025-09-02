@@ -2,7 +2,6 @@
 # This file was contributed by ysenih@erpya.com from ERP Consultores y Asociados, C.A
 # This file was contributed by EdwinBetanc0urt@outlook.com https://github.com/EdwinBetanc0urt
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
-# Add support to default build
 
 name: Continuous Integration with Gradle
 
@@ -19,6 +18,7 @@ on:
     paths-ignore:
       - README.md
       - README.es.md
+      - docker/*
 
   pull_request:
     branches:
@@ -27,12 +27,13 @@ on:
       - develop
       - experimental
       - bugfix/**
-      - hotfix/**
       - feature/**
+      - hotfix/**
       - test/**
     paths-ignore:
       - README.md
       - README.es.md
+      - docker/*
 
 jobs:
 
@@ -54,10 +55,10 @@ jobs:
       - name: Setup Gradle 9
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: current # 9.0.0
+          gradle-version: 9.0.0 # current
 
       - name: Build with Gradle
-        run: gradle build
+        run: gradle build --warning-mode all --stacktrace
         env:
           ORG_GRADLE_PROJECT_deployUsername: ${{ secrets.DEPLOY_USER }}
           ORG_GRADLE_PROJECT_deployToken: ${{ secrets.DEPLOY_TOKEN }}
@@ -65,3 +66,10 @@ jobs:
           GITHUB_DEPLOY_USER: ${{ github.actor }}
           GITHUB_DEPLOY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_DEPLOY_REPOSITORY: ${{ secrets.DEPLOY_REPOSITORY }}
+
+      - name: Upload descriptor file artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: adempiere-processors-service.dsc
+          path: build/descriptors/adempiere-processors-service.dsc
+          retention-days: 1
