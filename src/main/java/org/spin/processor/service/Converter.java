@@ -18,7 +18,7 @@ package org.spin.processor.service;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 import org.spin.proto.processor.ProcessorLog;
-import org.spin.service.grpc.util.value.ValueManager;
+import org.spin.service.grpc.util.value.StringManager;
 
 /**
  * Class for convert any document
@@ -36,7 +36,14 @@ public class Converter {
 			return processLog;
 		}
 		processLog.setId(log.getP_ID());
-		processLog.setLog(ValueManager.validateNull(Msg.parseTranslation(Env.getCtx(), log.getP_Msg())));
+		processLog.setLog(
+			StringManager.getValidString(
+				Msg.parseTranslation(
+					Env.getCtx(),
+					log.getP_Msg()
+				)
+			)
+		);
 		return processLog;
 	}
 }
