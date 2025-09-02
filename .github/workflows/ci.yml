@@ -61,7 +61,7 @@ jobs:
         env:
           ORG_GRADLE_PROJECT_deployUsername: ${{ secrets.DEPLOY_USER }}
           ORG_GRADLE_PROJECT_deployToken: ${{ secrets.DEPLOY_TOKEN }}
-          ORG_GRADLE_PROJECT_deplyRepository: ${{ secrets.DEPLOY_REPOSITORY }}
+          ORG_GRADLE_PROJECT_deployRepository: ${{ secrets.DEPLOY_REPOSITORY }}
           GITHUB_DEPLOY_USER: ${{ github.actor }}
           GITHUB_DEPLOY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_DEPLOY_REPOSITORY: ${{ secrets.DEPLOY_REPOSITORY }}

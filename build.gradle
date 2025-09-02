@@ -2,14 +2,16 @@ plugins {
     id 'java'
     id 'com.google.protobuf' version '0.9.4'
     id 'idea'
+	// Provide convenience executables for trying out the examples.
     id 'application'
+	// Generate Visual Studio Code .vscode & .json project files
     id 'visual-studio'
+	// Read .env files
 	id "io.github.uoxx3.project-environment" version "1.0.1"
 }
 
-group 'com.nikhilm'
 
-def grpcVersion = '1.62.2'
+def grpcVersion = '1.65.1'
 def protobufVersion = '3.25.3'
 def baseVersion = '3.9.4'
 def baseGroupId = 'io.github.adempiere'
@@ -46,14 +48,37 @@ jar {
 	}
 }
 
+run {
+	doFirst {
+		// Set environment variables by .env project file
+		environment 'JWT_SECRET_KEY', '52D11677CBB494878FD6E93B5A6615052A93B8AC654DE543CC4F53BA56027B1C'
+		environment 'JWT_EXPIRATION_TIME', 86400000
+		environment "TZ", projectEnv.get("TZ", null) ?: "America/Caracas"
+	}
+	args = [
+		"resources/env.yaml"
+	]
+}
+
 repositories {
 	mavenLocal()
-    mavenCentral()
-    maven {
-		// Adempiere GitHub Organization
+	mavenCentral()
+	maven {
+		// Custom GitHub Repository (ADempiere by Default)
 		url = findProperty("deployRepository") ?: System.properties['deploy.repository'] ?:
 			projectEnv.get("GITHUB_DEPLOY_REPOSITORY", null) ?: System.getenv("GITHUB_DEPLOY_REPOSITORY") ?:
 			"https://maven.pkg.github.com/adempiere/adempiere"
+		credentials {
+			// project property, system property, .env project file, system enviroment variable
+			username = findProperty("deployUsername") ?: System.properties['deploy.user'] ?:
+				projectEnv.get("GITHUB_DEPLOY_USER", null) ?: System.getenv("GITHUB_DEPLOY_USER")
+			password = findProperty("deployToken") ?: System.properties['deploy.token'] ?:
+				projectEnv.get("GITHUB_DEPLOY_TOKEN", null) ?: System.getenv("GITHUB_DEPLOY_TOKEN")
+		}
+	}
+	maven {
+		// Adempiere GitHub Organization
+		url = 'https://maven.pkg.github.com/adempiere/adempiere'
 		credentials {
 			// project property, system property, .env project file, system enviroment variable
 			username = findProperty("deployUsername") ?: System.properties['deploy.user'] ?:
@@ -110,18 +135,6 @@ sourceSets {
 			include 'org/spin/base/version.properties'
 		}
 	}
-}
-
-run {
-	doFirst {
-		// Set environment variables
-		environment 'JWT_SECRET_KEY', '52D11677CBB494878FD6E93B5A6615052A93B8AC654DE543CC4F53BA56027B1C'
-		environment 'JWT_EXPIRATION_TIME', 86400000
-		environment 'TZ', 'America/Caracas'
-	}
-	args = [
-		"resources/env.yaml"
-	]
 }
 
 startScripts {
