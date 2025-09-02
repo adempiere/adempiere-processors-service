@@ -1,5 +1,26 @@
 # ADempiere Processor
 
+<p align="center">
+  <a href="https://adoptium.net/es/temurin/releases/?version=17">
+    <img src="https://badgen.net/badge/Java/17/orange" alt="Java">
+  </a>
+  <a href="https://hub.docker.com/r/openls/adempiere-processors-service">
+    <img src="https://img.shields.io/docker/pulls/openls/adempiere-s-service.svg" alt="Docker Pulls">
+  </a>
+  <a href="https://github.com/adempiere/adempiere-processors-service/actions/workflows/ci.yml">
+    <img src="https://github.com/adempiere/adempiere-processors-service/actions/workflows/ci.yml/badge.svg" alt="Build GH Action">
+  </a>
+  <a href="https://github.com/adempiere/adempiere-processors-service/blob/master/LICENSE">
+    <img src="https://img.shields.io/badge/license-GNU/GPL%20(v2)-blue" alt="License">
+  </a>
+  <a href="https://github.com/adempiere/adempiere-processors-service/releases/latest">
+    <img src="https://img.shields.io/github/release/adempiere/adempiere-processors-service.svg" alt="GitHub release">
+  </a>
+  <a href="https://discord.gg/T6eH6A7PJZ">
+    <img src="https://badgen.net/badge/discord/join%20chat" alt="Discord">
+  </a>
+</p>
+
 This project allows run **ADempiere Processors** as service using a little struct.
 
 The resources for this are:
@@ -38,8 +59,23 @@ For Token validation is used [JWT](https://www.viralpatel.net/java-create-valida
 ## Run with Docker
 
 ```Shell
-docker pull openls/adempiere-processors-service:alpine-1.0.1
+docker pull openls/adempiere-processors-service:alpine
 ```
+
+### Where is the image?
+
+You can find it from [Docker Hub](https://hub.docker.com/r/openls/adempiere-processors-service/tags)
+
+#### Image variants
+ * `Eclipse Temurin Alpine` java development kit based:
+   * `docker pull openls/adempiere-processors-service:alpine`
+   * `docker pull openls/adempiere-processors-service:1.1.0-alpine`
+   * `docker pull openls/adempiere-processors-service:main-alpine`
+ * `Eclipse Temurin Noble` java development kit based:
+   * `docker pull openls/adempiere-processors-service:latest`
+   * `docker pull openls/adempiere-processors-service:1.1.0`
+   * `docker pull openls/adempiere-processors-service:main`
+
 
 ### Minimal Docker Requirements
 To use this Docker image you must have your Docker engine version greater than or equal to 3.0.
