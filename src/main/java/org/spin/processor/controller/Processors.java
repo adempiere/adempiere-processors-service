@@ -38,11 +38,13 @@ public class Processors extends ProcessorsImplBase {
 			responseObserver.onNext(builder.build());
 			responseObserver.onCompleted();
 		} catch (Exception e) {
-			log.severe(e.getLocalizedMessage());
-			responseObserver.onError(Status.INTERNAL
-				.withDescription(e.getLocalizedMessage())
-				.withCause(e)
-				.asRuntimeException()
+			log.warning(e.getLocalizedMessage());
+			e.printStackTrace();
+			responseObserver.onError(
+				Status.INTERNAL
+					.withDescription(e.getLocalizedMessage())
+					.withCause(e)
+					.asRuntimeException()
 			);
 		}
 	}
@@ -54,14 +56,17 @@ public class Processors extends ProcessorsImplBase {
 			responseObserver.onNext(response.build());
 			responseObserver.onCompleted();
 		} catch (Exception e) {
-			log.severe(e.getLocalizedMessage());
-			responseObserver.onError(Status.INTERNAL
+			log.warning(e.getLocalizedMessage());
+			e.printStackTrace();
+			responseObserver.onError(
+				Status.INTERNAL
 					.withDescription(e.getLocalizedMessage())
 					.withCause(e)
-					.asRuntimeException());
+					.asRuntimeException()
+			);
 		}
 	}
-	
+
 	@Override
 	public void runAlert(RunProcessorRequest request, StreamObserver<RunProcessorResponse> responseObserver) {
 		try {
@@ -69,14 +74,17 @@ public class Processors extends ProcessorsImplBase {
 			responseObserver.onNext(response.build());
 			responseObserver.onCompleted();
 		} catch (Exception e) {
-			log.severe(e.getLocalizedMessage());
-			responseObserver.onError(Status.INTERNAL
+			log.warning(e.getLocalizedMessage());
+			e.printStackTrace();
+			responseObserver.onError(
+				Status.INTERNAL
 					.withDescription(e.getLocalizedMessage())
 					.withCause(e)
-					.asRuntimeException());
+					.asRuntimeException()
+			);
 		}
 	}
-	
+
 	@Override
 	public void runProject(RunProcessorRequest request, StreamObserver<RunProcessorResponse> responseObserver) {
 		try {
@@ -84,14 +92,17 @@ public class Processors extends ProcessorsImplBase {
 			responseObserver.onNext(response.build());
 			responseObserver.onCompleted();
 		} catch (Exception e) {
-			log.severe(e.getLocalizedMessage());
-			responseObserver.onError(Status.INTERNAL
+			log.warning(e.getLocalizedMessage());
+			e.printStackTrace();
+			responseObserver.onError(
+				Status.INTERNAL
 					.withDescription(e.getLocalizedMessage())
 					.withCause(e)
-					.asRuntimeException());
+					.asRuntimeException()
+			);
 		}
 	}
-	
+
 	@Override
 	public void runRequest(RunProcessorRequest request, StreamObserver<RunProcessorResponse> responseObserver) {
 		try {
@@ -99,14 +110,17 @@ public class Processors extends ProcessorsImplBase {
 			responseObserver.onNext(response.build());
 			responseObserver.onCompleted();
 		} catch (Exception e) {
-			log.severe(e.getLocalizedMessage());
-			responseObserver.onError(Status.INTERNAL
+			log.warning(e.getLocalizedMessage());
+			e.printStackTrace();
+			responseObserver.onError(
+				Status.INTERNAL
 					.withDescription(e.getLocalizedMessage())
 					.withCause(e)
-					.asRuntimeException());
+					.asRuntimeException()
+			);
 		}
 	}
-	
+
 	@Override
 	public void runScheduler(RunProcessorRequest request, StreamObserver<RunProcessorResponse> responseObserver) {
 		try {
@@ -114,14 +128,17 @@ public class Processors extends ProcessorsImplBase {
 			responseObserver.onNext(response.build());
 			responseObserver.onCompleted();
 		} catch (Exception e) {
-			log.severe(e.getLocalizedMessage());
-			responseObserver.onError(Status.INTERNAL
+			log.warning(e.getLocalizedMessage());
+			e.printStackTrace();
+			responseObserver.onError(
+				Status.INTERNAL
 					.withDescription(e.getLocalizedMessage())
 					.withCause(e)
-					.asRuntimeException());
+					.asRuntimeException()
+			);
 		}
 	}
-	
+
 	@Override
 	public void runWorkflow(RunProcessorRequest request, StreamObserver<RunProcessorResponse> responseObserver) {
 		try {
@@ -129,11 +146,15 @@ public class Processors extends ProcessorsImplBase {
 			responseObserver.onNext(response.build());
 			responseObserver.onCompleted();
 		} catch (Exception e) {
-			log.severe(e.getLocalizedMessage());
-			responseObserver.onError(Status.INTERNAL
+			log.warning(e.getLocalizedMessage());
+			e.printStackTrace();
+			responseObserver.onError(
+				Status.INTERNAL
 					.withDescription(e.getLocalizedMessage())
 					.withCause(e)
-					.asRuntimeException());
+					.asRuntimeException()
+			);
 		}
 	}
+
 }

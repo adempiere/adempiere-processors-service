@@ -108,7 +108,8 @@ public class Service {
 		if(process == null || process.getAD_Process_ID() <= 0) {
 			throw new AdempiereException("@AD_Process_ID@ @NotFound@");
 		}
-		if(!Optional.ofNullable(MRole.getDefault().getProcessAccess(process.getAD_Process_ID())).orElse(false)) {
+		MRole role = MRole.getDefault();
+		if(!Optional.ofNullable(role.getProcessAccess(process.getAD_Process_ID())).orElse(false)) {
 			if (process.isReport()) {
 				throw new AdempiereException("@AccessCannotReport@");
 			}
