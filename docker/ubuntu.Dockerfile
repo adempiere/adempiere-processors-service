@@ -1,7 +1,7 @@
 FROM eclipse-temurin:17.0.16_8-jdk-noble
 
 LABEL maintainer="ySenih@erpya.com; EdwinBetanc0urt@outlook.com;" \
-	description="ADempiere Processors gRPC"
+	description="ADempiere Processors gRPC Service"
 
 # Init ENV with default values
 ENV \
@@ -48,7 +48,7 @@ RUN apt-get update && \
 	ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
 	echo $TZ > /etc/timezone && \
 	# Clean up
-    apt-get autoremove -y && \
+	apt-get autoremove -y && \
 	apt-get clean && \
 	rm -rf /var/lib/apt/lists/* \
 	rm -rf /tmp/*
