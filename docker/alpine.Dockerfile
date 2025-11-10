@@ -1,7 +1,7 @@
 FROM eclipse-temurin:17.0.16_8-jdk-alpine-3.22
 
 LABEL maintainer="ySenih@erpya.com; EdwinBetanc0urt@outlook.com;" \
-	description="ADempiere Processors gRPC"
+	description="ADempiere Processors gRPC Service"
 
 # Init ENV with default values
 ENV \
@@ -15,7 +15,7 @@ ENV \
 	DB_NAME="adempiere" \
 	DB_USER="adempiere" \
 	DB_PASSWORD="adempiere" \
-    # Connection Pool
+	# Connection Pool
 	IDLE_TIMEOUT="300" \
 	MINIMUM_IDLE="1" \
 	MAXIMUM_POOL_SIZE="10" \
@@ -31,7 +31,7 @@ EXPOSE ${SERVER_PORT}
 
 
 # Add operative system dependencies
-RUN	apk update && \
+RUN apk update && \
 	apk add --no-cache \
 		bash \
 		ca-certificates \
@@ -41,7 +41,7 @@ RUN	apk update && \
 		tzdata && \
 	echo "Install Microsoft Fonts..." && \
 	update-ms-fonts && \
-	fc-cache -f -v && \
+	fc-cache -f && \
 	echo "Set Timezone..." && \
 	ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
 	echo $TZ > /etc/timezone && \
