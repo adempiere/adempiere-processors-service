@@ -22,10 +22,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Java JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-package: 'jdk'
@@ -33,9 +33,9 @@ jobs:
           architecture: x64
 
       - name: Setup Gradle 9
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
         with:
-          gradle-version: 9.0.0 # current
+          gradle-version: 9.1.0 # current
 
       - name: Set Version Properties
         run: |
@@ -63,7 +63,7 @@ jobs:
           ls -la flat_artifacts/
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: release-artifacts
           path: flat_artifacts/*
@@ -77,7 +77,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: release-artifacts
           path: artifacts/
@@ -87,13 +87,13 @@ jobs:
           tree artifacts
 
       - name: Upload to GitHub Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.release.tag_name }}
           files: |
             artifacts/adempiere-processors-service.dsc
-            artifacts/envoy.yaml
             artifacts/env.yaml
+            artifacts/envoy.yaml
             artifacts/adempiere-processors-service.zip.MD5
             artifacts/adempiere-processors-service.zip
             artifacts/adempiere-processors-service.tar.MD5
@@ -110,9 +110,9 @@ jobs:
       - build-app
     runs-on: ubuntu-latest
     outputs:
-      is_have_secrets: ${{ steps.check_secret_job.outputs.is_have_secrets }}
+      is_have_secrets: ${{ steps.check_docker_registry_secrets_job.outputs.is_have_secrets }}
     steps:
-      - id: check_secret_job
+      - id: check_docker_registry_secrets_job
         run: |
           if [[ "${{ secrets.DOCKER_HUB_REPO_NAME }}" != "" && \
                 "${{ secrets.DOCKER_USERNAME }}" != "" && \
@@ -136,10 +136,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Download dist artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: release-artifacts
           path: artifacts/
@@ -196,10 +196,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Download dist artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: release-artifacts
           path: artifacts/
@@ -287,10 +287,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Download dist artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: release-artifacts
           path: artifacts/
@@ -342,4 +342,3 @@ jobs:
           platforms: linux/amd64,linux/amd64/v2,linux/arm64/v8
           push: true
           tags: ${{ steps.set_proxy_tags.outputs.tags_to_push }}
-
