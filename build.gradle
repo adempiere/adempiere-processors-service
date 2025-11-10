@@ -239,7 +239,7 @@ dependencies {
 	implementation "${baseGroupId}:jasperreports:${baseVersion}"
 
 	// ADempiere Projects with additional features
-	implementation "${baseGroupId}:adempiere-grpc-utils:1.5.7"
+	implementation "${baseGroupId}:adempiere-grpc-utils:1.6.2"
 	implementation "${baseGroupId}:adempiere-business-processors:1.1.8"
 
 	//	Others
