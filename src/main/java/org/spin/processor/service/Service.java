@@ -34,9 +34,8 @@ import org.spin.eca46.process.WorkflowProcessor;
 import org.spin.proto.processor.ProcessorLog;
 import org.spin.proto.processor.RunProcessorResponse;
 import org.spin.proto.processor.SystemInfo;
-import org.spin.service.grpc.util.value.StringManager;
+import org.spin.service.grpc.util.value.TextManager;
 import org.spin.service.grpc.util.value.TimeManager;
-import org.spin.service.grpc.util.value.ValueManager;
 
 public class Service {
 
@@ -44,19 +43,19 @@ public class Service {
 		SystemInfo.Builder builder = SystemInfo.newBuilder();
 		// backend info
 		builder.setDateVersion(
-				ValueManager.getTimestampFromDate(
+				TimeManager.getProtoTimestampFromTimestamp(
 					TimeManager.getTimestampFromString(
 						Version.DATE_VERSION
 					)
 				)
 			)
 			.setMainVersion(
-				StringManager.getValidString(
+				TextManager.getValidString(
 					Version.MAIN_VERSION
 				)
 			)
 			.setImplementationVersion(
-				StringManager.getValidString(
+				TextManager.getValidString(
 					Version.IMPLEMENTATION_VERSION
 				)
 			)
@@ -134,7 +133,7 @@ public class Service {
 			String summary = Msg.parseTranslation(Env.getCtx(), result.getSummary());
 			if(Util.isEmpty(summary, true)) {
 				result.setSummary(
-					StringManager.getValidString(
+					TextManager.getValidString(
 						e.getLocalizedMessage()
 					)
 				);

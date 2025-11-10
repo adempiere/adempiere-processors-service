@@ -18,7 +18,7 @@ package org.spin.processor.service;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 import org.spin.proto.processor.ProcessorLog;
-import org.spin.service.grpc.util.value.StringManager;
+import org.spin.service.grpc.util.value.TextManager;
 
 /**
  * Class for convert any document
@@ -37,7 +37,7 @@ public class Converter {
 		}
 		processLog.setId(log.getP_ID());
 		processLog.setLog(
-			StringManager.getValidString(
+			TextManager.getValidString(
 				Msg.parseTranslation(
 					Env.getCtx(),
 					log.getP_Msg()
