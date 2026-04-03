@@ -27,11 +27,21 @@ application {
 	mainClass.set(javaMainClass)
 }
 jar {
+	duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
 	manifest {
 		attributes(
 			"Main-Class": javaMainClass
 		)
 	}
+	// Extract lsv-general classes into the project JAR so they are found first
+	// on the classpath (project JAR precedes all lib/ JARs per AdempiereProcessorServer definition).
+	// This ensures SHW customizations take precedence over ADempiere base classes.
+	from {
+		configurations.runtimeClasspath
+			.filter { it.name.contains('lsv-general') }
+			.collect { zipTree(it) }
+	}
+	exclude('META-INF/**')
 }
 
 repositories {
