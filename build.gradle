@@ -195,5 +195,5 @@ dependencies {
 	//	Others
     compileOnly 'org.apache.tomcat:annotations-api:6.0.53'
 	//	SHW Libraries
-	implementation 'com.shw:adempiere-shw.shw_libs:3.9.4.001-1.1.57'
+	implementation 'com.shw:adempiere-shw.shw_libs:3.9.4.001-1.1.59'
 }
