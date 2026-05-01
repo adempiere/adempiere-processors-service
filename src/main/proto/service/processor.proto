@@ -36,6 +36,7 @@ message ProcessorLog {
 	string log = 2;
 }
 
+
 // The greeting service definition.
 service Processors {
 	// system information
@@ -47,26 +48,38 @@ service Processors {
 
 	// Accounting Processor
 	rpc RunAccounting(RunProcessorRequest) returns (RunProcessorResponse) {
-		option (google.api.http) = { post: "/v1/accounting/{client_id}/{id}" };
+		option (google.api.http) = {
+			post: "/v1/accounting/{client_id}/{id}"
+		};
 	}
 	// Alert Processor
 	rpc RunAlert(RunProcessorRequest) returns (RunProcessorResponse) {
-		option (google.api.http) = { post: "/v1/alert/{client_id}/{id}" };
+		option (google.api.http) = {
+			post: "/v1/alert/{client_id}/{id}"
+		};
 	}
 	// Project Processor
 	rpc RunProject(RunProcessorRequest) returns (RunProcessorResponse) {
-		option (google.api.http) = { post: "/v1/project/{client_id}/{id}" };
+		option (google.api.http) = {
+			post: "/v1/project/{client_id}/{id}"
+		};
 	}
 	// Request Processor
 	rpc RunRequest(RunProcessorRequest) returns (RunProcessorResponse) {
-		option (google.api.http) = { post: "/v1/request/{client_id}/{id}" };
+		option (google.api.http) = {
+			post: "/v1/request/{client_id}/{id}"
+		};
 	}
 	// Scheduler Processor
 	rpc RunScheduler(RunProcessorRequest) returns (RunProcessorResponse) {
-		option (google.api.http) = { post: "/v1/scheduler/{client_id}/{id}" };
+		option (google.api.http) = {
+			post: "/v1/scheduler/{client_id}/{id}"
+		};
 	}
 	// Workflow Processor
 	rpc RunWorkflow(RunProcessorRequest) returns (RunProcessorResponse) {
-		option (google.api.http) = { post: "/v1/workflow/{client_id}/{id}" };
+		option (google.api.http) = {
+			post: "/v1/workflow/{client_id}/{id}"
+		};
 	}
 }

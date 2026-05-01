@@ -1,0 +1,21 @@
+{
+    // Use IntelliSense para saber los atributos posibles.
+    // Mantenga el puntero para ver las descripciones de los existentes atributos.
+    // Para más información, visite: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "ADempiere Processors Service",
+            "request": "launch",
+            "mainClass": "org.spin.processor.server.ProcessorServer",
+            // "projectName": "adempiere-processors-service",
+            "env": {
+                "JWT_SECRET_KEY": "52D11677CBB494878FD6E93B5A6615052A93B8AC654DE543CC4F53BA56027B1C",
+                "JWT_EXPIRATION_TIME": 86400000,
+                "TZ": "America/Caracas"
+            },
+            "args": "'resources/env.yaml'"
+        }
+    ]
+}
