@@ -209,5 +209,8 @@ dependencies {
 	//	Others
     compileOnly 'org.apache.tomcat:annotations-api:6.0.53'
 	// ADempiere customizations template (replaces com.shw:adempiere-shw.shw_libs)
-	implementation 'io.github.adempiere:adempiere-customizations:3.9.4.001-1.0.0'
+	// exclude: patches subproject was not published; it is an empty stub in the community template
+	implementation('io.github.adempiere:adempiere-customizations:3.9.4.001-1.0.0') {
+		exclude group: 'adempiere-customizations', module: 'adempiere-customizations.patches'
+	}
 }
