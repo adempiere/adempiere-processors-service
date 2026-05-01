@@ -1,5 +1,14 @@
 # ADempiere Processor
 
+> [!IMPORTANT]
+> This repository is part of the [ADempiere UI Gateway](https://github.com/adempiere/adempiere-ui-gateway) stack —
+> a set of cooperating services that together provide the ADempiere web and gRPC frontend.
+> The migration of all stack repositories from the [Systemhaus-Westfalia](https://github.com/Systemhaus-Westfalia)
+> organization to the [ADempiere](https://github.com/adempiere) organization is currently in progress.
+> Until the complete stack has been migrated and validated end-to-end, this repository should be considered
+> **under construction**. Interfaces and configuration may change without notice.
+> Production use is not yet recommended.
+
 <p align="center">
   <a href="https://adoptium.net/es/temurin/releases/?version=17">
     <img src="https://badgen.net/badge/Java/17/orange" alt="Java">
