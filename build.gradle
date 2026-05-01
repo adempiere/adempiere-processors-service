@@ -11,6 +11,11 @@ plugins {
 }
 
 
+java {
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
+}
+
 def grpcVersion = '1.65.1'
 def protobufVersion = '3.25.3'
 def baseVersion = '3.9.4'
@@ -24,28 +29,28 @@ ext {
 }
 
 
-java {
-	sourceCompatibility = JavaVersion.VERSION_11
-	targetCompatibility = JavaVersion.VERSION_17
-}
-
 application {
 	mainClass.set(javaMainClass)
-
-	// distribution output
-	distributions {
-		main {
-			contents {
-			}
-		}
-	}
 }
+
 jar {
+	duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
 	manifest {
 		attributes(
 			"Main-Class": javaMainClass
 		)
 	}
+	// === Organization-specific JAR extraction ===
+	// If your patches module contains a localization or customization JAR whose classes
+	// must take precedence over ADempiere base classes at runtime, extract them here.
+	// Replace 'my-customization' with the artifact name of your JAR.
+	//
+	// from {
+	// 	configurations.runtimeClasspath
+	// 		.filter { it.name.contains('my-customization') }
+	// 		.collect { zipTree(it) }
+	// }
+	// exclude('META-INF/**')
 }
 
 run {
@@ -64,27 +69,27 @@ repositories {
 	mavenLocal()
 	mavenCentral()
 	maven {
-		// Custom GitHub Repository (ADempiere by Default)
-		url = findProperty("deployRepository") ?: System.properties['deploy.repository'] ?:
-			projectEnv.get("GITHUB_DEPLOY_REPOSITORY", null) ?: System.getenv("GITHUB_DEPLOY_REPOSITORY") ?:
-			"https://maven.pkg.github.com/adempiere/adempiere"
+		// ADempiere customizations — community template published to adempiere GitHub Packages
+		url = "https://maven.pkg.github.com/adempiere/adempiere-customizations"
 		credentials {
-			// project property, system property, .env project file, system enviroment variable
-			username = findProperty("deployUsername") ?: System.properties['deploy.user'] ?:
-				projectEnv.get("GITHUB_DEPLOY_USER", null) ?: System.getenv("GITHUB_DEPLOY_USER")
-			password = findProperty("deployToken") ?: System.properties['deploy.token'] ?:
-				projectEnv.get("GITHUB_DEPLOY_TOKEN", null) ?: System.getenv("GITHUB_DEPLOY_TOKEN")
+			username = findProperty("deployUsername") ?: System.properties['deploy.user'] ?: System.getenv("GITHUB_DEPLOY_USER")
+			password = findProperty("deployToken") ?: System.properties['deploy.token'] ?: System.getenv("GITHUB_DEPLOY_TOKEN")
+		}
+	}
+	// ERP Repos
+	maven {
+		url = "https://maven.pkg.github.com/erpya/repository"
+		credentials {
+			username = findProperty("deployUsername") ?: System.properties['deploy.user'] ?: System.getenv("GITHUB_DEPLOY_USER")
+			password = findProperty("deployToken") ?: System.properties['deploy.token'] ?: System.getenv("GITHUB_DEPLOY_TOKEN")
 		}
 	}
 	maven {
 		// Adempiere GitHub Organization
-		url = 'https://maven.pkg.github.com/adempiere/adempiere'
+		url = findProperty("deployRepository") ?: System.properties['deploy.repository'] ?: System.getenv("GITHUB_DEPLOY_REPOSITORY") ?: 'https://maven.pkg.github.com/adempiere/adempiere'
 		credentials {
-			// project property, system property, .env project file, system enviroment variable
-			username = findProperty("deployUsername") ?: System.properties['deploy.user'] ?:
-				projectEnv.get("GITHUB_DEPLOY_USER", null) ?: System.getenv("GITHUB_DEPLOY_USER")
-			password = findProperty("deployToken") ?: System.properties['deploy.token'] ?:
-				projectEnv.get("GITHUB_DEPLOY_TOKEN", null) ?: System.getenv("GITHUB_DEPLOY_TOKEN")
+			username = findProperty("deployUsername") ?: System.properties['deploy.user'] ?: System.getenv("GITHUB_DEPLOY_USER")
+			password = findProperty("deployToken") ?: System.properties['deploy.token'] ?: System.getenv("GITHUB_DEPLOY_TOKEN")
 		}
 	}
 }
@@ -107,15 +112,15 @@ protobuf {
 			// task.outputBaseDir. Default is false.
 			// See --descriptor_set_out in protoc documentation about what it is.
 			task.generateDescriptorSet = true
-			
+
 			// Allows to override the default for the descriptor set location
 			task.descriptorSetOptions.path = "${projectDir}/build/descriptors/${descriptorFile}"
 			// task.descriptorSetOptions.path = "${projectDir}/build/descriptors/adempiere-processors-service.dsc"
-			
+
 			// If true, the descriptor set will contain line number information
 			// and comments. Default is false.
 			task.descriptorSetOptions.includeSourceInfo = true
-			
+
 			// If true, the descriptor set will contain all transitive imports and
 			// is therefore self-contained. Default is false.
 			task.descriptorSetOptions.includeImports = true
@@ -137,32 +142,6 @@ sourceSets {
 	}
 }
 
-startScripts {
-	applicationName = 'start-backend'
-
-	// default JVM setting
-	defaultJvmOpts = [
-		"-DPropertyFile=Adempiere.properties", 
-		"-Dorg.adempiere.server.embedded=true"
-	]
-	outputDir = new File(project.buildDir, 'tmp')
-	classpath = jar.outputs.files + project.configurations.runtimeClasspath
-
-	// Configure script names with extensions
-	doLast {
-		def unixScript = file(getUnixScript())
-		def windowsScript = file(getWindowsScript())
-
-		// Rename files after generating them
-		unixScript.renameTo("${unixScript.parent}/${applicationName}.sh")
-		windowsScript.renameTo("${windowsScript.parent}/${applicationName}.bat")
-
-		// Configure permissions for generated scripts
-		unixScript.setExecutable(true, false)
-		// windowsScript.setExecutable(true, false)
-	}
-}
-
 // Copy proto descriptor another folder
 allprojects {
 	task copyDescriptor(type: Copy) {
@@ -179,14 +158,35 @@ allprojects {
 	}.each { task ->
 		task.finalizedBy copyDescriptor
 	}
+
+	// Gradle 9.0.0: implicit task dependencies are errors — declare explicit ordering.
+	// copyDescriptor reads the same output path that every generateXxxProto task writes.
+	tasks.matching {
+		it.name.startsWith('generate') && it.name.endsWith('Proto')
+	}.each { task ->
+		copyDescriptor.mustRunAfter task
+	}
 }
 
-// compressed files task
-distTar {
-	dependsOn compileTestJava, copyDescriptor, startScripts
+task AdempiereProcessorServer(type: CreateStartScripts) {
+	mainClass = javaMainClass
+    applicationName = 'adempiere-processors-service-server'
+    // Gradle 9.0.0: avoid build/tmp — other tasks write there too, causing implicit dependency errors
+    outputDir = new File(project.buildDir, 'startScripts')
+    classpath = jar.outputs.files + project.configurations.runtimeClasspath
 }
-distZip {
-	dependsOn compileTestJava, copyDescriptor, startScripts
+
+// Gradle 9.0.0: applicationDistribution removed — use distributions.main.contents instead
+distributions {
+    main {
+        contents {
+            into('bin') {
+                from(AdempiereProcessorServer)
+                // Gradle 9.0.0: fileMode integer removed — use filePermissions closure
+                filePermissions { unix(0755) }
+            }
+        }
+    }
 }
 
 //	Create release for project
@@ -244,4 +244,6 @@ dependencies {
 
 	//	Others
     compileOnly 'org.apache.tomcat:annotations-api:6.0.53'
+	// ADempiere customizations template (replaces com.shw:adempiere-shw.shw_libs)
+	implementation 'io.github.adempiere:adempiere-customizations:3.9.4.001-1.0.0'
 }

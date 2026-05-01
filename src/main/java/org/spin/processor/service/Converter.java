@@ -36,14 +36,7 @@ public class Converter {
 			return processLog;
 		}
 		processLog.setId(log.getP_ID());
-		processLog.setLog(
-			TextManager.getValidString(
-				Msg.parseTranslation(
-					Env.getCtx(),
-					log.getP_Msg()
-				)
-			)
-		);
+		processLog.setLog(TextManager.getValidString(Msg.parseTranslation(Env.getCtx(), log.getP_Msg())));
 		return processLog;
 	}
 }
