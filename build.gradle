@@ -140,6 +140,14 @@ allprojects {
 	}.each { task ->
 		task.finalizedBy copyDescriptor
 	}
+
+	// Gradle 9.0.0: implicit task dependencies are errors — declare explicit ordering.
+	// copyDescriptor reads the same output path that every generateXxxProto task writes.
+	tasks.matching {
+		it.name.startsWith('generate') && it.name.endsWith('Proto')
+	}.each { task ->
+		copyDescriptor.mustRunAfter task
+	}
 }
 
 task AdempiereProcessorServer(type: CreateStartScripts) {
