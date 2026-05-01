@@ -155,7 +155,8 @@ distributions {
         contents {
             into('bin') {
                 from(AdempiereProcessorServer)
-                fileMode = 0755
+                // Gradle 9.0.0: fileMode integer removed — use filePermissions closure
+                filePermissions { unix(0755) }
             }
         }
     }
