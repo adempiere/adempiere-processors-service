@@ -33,22 +33,25 @@ jar {
 			"Main-Class": javaMainClass
 		)
 	}
-	// Extract lsv-general classes into the project JAR so they are found first
-	// on the classpath (project JAR precedes all lib/ JARs per AdempiereProcessorServer definition).
-	// This ensures SHW customizations take precedence over ADempiere base classes.
-	from {
-		configurations.runtimeClasspath
-			.filter { it.name.contains('lsv-general') }
-			.collect { zipTree(it) }
-	}
-	exclude('META-INF/**')
+	// === Organization-specific JAR extraction ===
+	// If your patches module contains a localization or customization JAR whose classes
+	// must take precedence over ADempiere base classes at runtime, extract them here.
+	// Replace 'my-customization' with the artifact name of your JAR.
+	//
+	// from {
+	// 	configurations.runtimeClasspath
+	// 		.filter { it.name.contains('my-customization') }
+	// 		.collect { zipTree(it) }
+	// }
+	// exclude('META-INF/**')
 }
 
 repositories {
 	mavenLocal()
     mavenCentral()
     maven {
-		url = "https://maven.pkg.github.com/Systemhaus-Westfalia/adempiere-shw"
+		// ADempiere customizations — community template published to adempiere GitHub Packages
+		url = "https://maven.pkg.github.com/adempiere/adempiere-customizations"
 		credentials {
 			username = findProperty("deployUsername") ?: System.properties['deploy.user'] ?: System.getenv("GITHUB_DEPLOY_USER")
 			password = findProperty("deployToken") ?: System.properties['deploy.token'] ?: System.getenv("GITHUB_DEPLOY_TOKEN")
@@ -194,6 +197,6 @@ dependencies {
 	// implementation "${baseGroupId}:adempiere-business-processors:1.1.8"
 	//	Others
     compileOnly 'org.apache.tomcat:annotations-api:6.0.53'
-	//	SHW Libraries
-	implementation 'com.shw:adempiere-shw.shw_libs:3.9.4.001-1.1.60'
+	// ADempiere customizations template (replaces com.shw:adempiere-shw.shw_libs)
+	implementation 'io.github.adempiere:adempiere-customizations:3.9.4.001-1.0.0'
 }
