@@ -153,7 +153,8 @@ allprojects {
 task AdempiereProcessorServer(type: CreateStartScripts) {
 	mainClass = javaMainClass
     applicationName = 'adempiere-processors-service-server'
-    outputDir = new File(project.buildDir, 'tmp')
+    // Gradle 9.0.0: avoid build/tmp — other tasks write there too, causing implicit dependency errors
+    outputDir = new File(project.buildDir, 'startScripts')
     classpath = jar.outputs.files + project.configurations.runtimeClasspath
 }
 
