@@ -149,9 +149,16 @@ task AdempiereProcessorServer(type: CreateStartScripts) {
     classpath = jar.outputs.files + project.configurations.runtimeClasspath
 }
 
-applicationDistribution.into('bin') {
-	from(AdempiereProcessorServer)
-    fileMode = 0755
+// Gradle 9.0.0: applicationDistribution removed — use distributions.main.contents instead
+distributions {
+    main {
+        contents {
+            into('bin') {
+                from(AdempiereProcessorServer)
+                fileMode = 0755
+            }
+        }
+    }
 }
 
 //	Create release for project
