@@ -7,7 +7,7 @@ sed -i "s|50059|$SERVER_PORT|g" env.yaml
 sed -i "s|WARNING|$SERVER_LOG_LEVEL|g" env.yaml
 
 export DEFAULT_JAVA_OPTIONS='"-Xms64M" "-Xmx1512M"'
-sed -i "s|$DEFAULT_JAVA_OPTIONS|$JAVA_OPTIONS|g" bin/start-backend.sh
+sed -i "s|$DEFAULT_JAVA_OPTIONS|$JAVA_OPTIONS|g" bin/adempiere-processors-service-server
 
 # Set data base conection values
 sed -i "s|PostgreSQL|$DB_TYPE|g" env.yaml
@@ -32,4 +32,4 @@ sed -i "s|fill_keepalive_time|$KEEPALIVE_TIME|g" env.yaml
 sed -i "s|fill_connection_test_query|$CONNECTION_TEST_QUERY|g" env.yaml
 
 # Run app
-bin/start-backend.sh env.yaml
+bin/adempiere-processors-service-server env.yaml
